@@ -7,14 +7,14 @@
 import { TransformOptions } from "@babel/core";
 
 /**
- * Type for operations that return a value or error
+ * Type for operations that return a value or error.
  */
 export type Result<T, E = string> =
   | { ok: true; value: T }
   | { ok: false; error: E };
 
 /**
- * Type for validation operations that only need success/failure
+ * Type for validation operations that only need success/failure.
  */
 export type ValidationResult = { ok: true } | { ok: false; error: string };
 
@@ -25,7 +25,7 @@ export type PrefixInfo = { category: string; prefix: string; length: number };
 
 /**
  * Result from parsing Tailwind classes in JSX/TSX code.
- * Separates base classes, dynamic expressions, and handles viewport variants.
+ * Separates base classes, dynamic expressions, and viewport variants.
  */
 export interface ClassParseResult {
   /** Static classes or simple expressions with tailwind prefixes */
@@ -61,11 +61,17 @@ export interface FormatterConfig {
   /** How to group viewport-specific classes */
   viewportGrouping: "separate" | "separate-categorized" | "inline";
 
-  /** Format classes on multiple lines when width exceeds this number */
-  multiLineThreshold: number;
+  /** When true, always format Tailwind classes on multiple lines */
+  multiLineClasses: boolean;
 
-  /** Always format classes on a single line */
-  alwaysUseSingleLine: boolean;
+  /** Format classes on multiple lines when width exceeds this number */
+  multiLineClassThreshold: number;
+
+  /** When true, non-class/className attributes are always formatted on multiple lines */
+  multiLineAttributes: boolean;
+
+  /** Format non-class/className attributes on multiple lines when total width exceeds this number */
+  multiLineAttributeThreshold: number;
 
   /** Whether to use tabs instead of spaces */
   usesTabs: boolean;
