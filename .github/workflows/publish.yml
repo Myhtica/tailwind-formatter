@@ -1,0 +1,77 @@
+name: Release and publish extension
+
+on:
+  push:
+    tags:
+      - "v*" # Run when tag is pushed matching v*, e.g., v1.0.0
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g., patch, minor, major, or specific version like 1.2.3)"
+        required: true
+        default: "patch"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed for version comparison
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "npm"
+
+      - name: Bump version if manual workflow
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+          if [[ "${{ github.event.inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            # If specific version provided
+            npm version ${{ github.event.inputs.version }} --no-git-tag-version
+          else
+            # If patch, minor, or major
+            npm version ${{ github.event.inputs.version }} --no-git-tag-version
+          fi
+
+          VERSION=$(node -p "require('./package.json').version")
+          echo "EXTENSION_VERSION=$VERSION" >> $GITHUB_ENV
+
+          git add package.json
+          git commit -m "Bump version to $VERSION"
+          git tag -a v$VERSION -m "Release v$VERSION"
+          git push --follow-tags
+
+      - name: Get version from tag
+        if: github.event_name == 'push'
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "EXTENSION_VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build extension
+        run: npm run package
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: "*.vsix"
+          name: "Release v${{ env.EXTENSION_VERSION }}"
+          tag_name: "v${{ env.EXTENSION_VERSION }}"
+          generate_release_notes: true
+
+      - name: Publish to VS Code Marketplace
+        if: success()
+        run: |
+          npx @vscode/vsce publish -p ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
