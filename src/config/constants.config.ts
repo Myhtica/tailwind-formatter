@@ -7,7 +7,7 @@
 import { TransformOptions } from "@babel/core";
 
 /**
- * Default Prettier configuration
+ * Default Prettier configuration.
  */
 export const DEFAULT_PRETTIER_CONFIG = {
   parser: "typescript", // Required for proper JSX/TSX parsing of text instead of files
@@ -17,7 +17,8 @@ export const DEFAULT_PRETTIER_CONFIG = {
 };
 
 /**
- * Supported file extensions for the formatter (requires a corresponding Babel config in FILE_CONFIGS)
+ * Supported file extensions for the formatter
+ * (requires a corresponding Babel config in FILE_CONFIGS).
  */
 export const SUPPORTED_EXTENSIONS = new Set(["jsx", "tsx"]);
 
