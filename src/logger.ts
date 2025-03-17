@@ -81,6 +81,16 @@ export class Logger {
   }
 
   /**
+   * Logs a warning message with timestamp to the output channel.
+   *
+   * @param message - The warning message to log
+   */
+  public warn(message: string): void {
+    const timestamp = new Date().toISOString();
+    this.outputChannel.appendLine(`[${timestamp}] WARNING: ${message}`);
+  }
+
+  /**
    * Logs a debug message to the console only.
    * Use for development-time debugging.
    *
