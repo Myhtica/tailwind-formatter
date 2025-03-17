@@ -63,12 +63,10 @@ export function parseTailwindClasses(
       t.isCallExpression(classNameExpression)
     ) {
       parsedClasses.dynamicExpressions.push(`\${${expressionText}}`);
+    } else if (hasTailwindPrefix(expressionText, categories)) {
+      processTailwindClasses(expressionText, parsedClasses, viewports);
     } else {
-      if (hasTailwindPrefix(expressionText, categories)) {
-        processTailwindClasses(expressionText, parsedClasses, viewports);
-      } else {
-        parsedClasses.dynamicExpressions.push(`\${${expressionText}}`);
-      }
+      parsedClasses.dynamicExpressions.push(`\${${expressionText}}`);
     }
   }
 
