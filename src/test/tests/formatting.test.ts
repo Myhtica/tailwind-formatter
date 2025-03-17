@@ -20,26 +20,47 @@ export function registerFormattingSuite() {
       await vscode.workspace
         .getConfiguration()
         .update(
-          "tailwindFormatter.formatting.multiLineThreshold",
-          originalConfig.get("formatting.multiLineThreshold"),
+          "tailwindFormatter.lineFormatting.multiLineClasses",
+          originalConfig.get("lineFormatting.multiLineClasses"),
           vscode.ConfigurationTarget.Global
         );
       await vscode.workspace
         .getConfiguration()
         .update(
-          "tailwindFormatter.formatting.alwaysUseSingleLine",
-          originalConfig.get("formatting.alwaysUseSingleLine"),
+          "tailwindFormatter.lineFormatting.classLineThreshold",
+          originalConfig.get("lineFormatting.classLineThreshold"),
+          vscode.ConfigurationTarget.Global
+        );
+      await vscode.workspace
+        .getConfiguration()
+        .update(
+          "tailwindFormatter.lineFormatting.multiLineAttributes",
+          originalConfig.get("lineFormatting.multiLineAttributes"),
+          vscode.ConfigurationTarget.Global
+        );
+      await vscode.workspace
+        .getConfiguration()
+        .update(
+          "tailwindFormatter.lineFormatting.attributeLineThreshold",
+          originalConfig.get("lineFormatting.attributeLineThreshold"),
           vscode.ConfigurationTarget.Global
         );
     });
 
-    suite("Always Single Line Mode", () => {
+    suite("Always Single Line", () => {
       suiteSetup(async () => {
         await vscode.workspace
           .getConfiguration()
           .update(
-            "tailwindFormatter.formatting.alwaysUseSingleLine",
-            true,
+            "tailwindFormatter.lineFormatting.multiLineClasses",
+            false,
+            vscode.ConfigurationTarget.Global
+          );
+        await vscode.workspace
+          .getConfiguration()
+          .update(
+            "tailwindFormatter.lineFormatting.classLineThreshold",
+            999,
             vscode.ConfigurationTarget.Global
           );
       });
@@ -75,18 +96,18 @@ export function registerFormattingSuite() {
 
     suite("Multi Line Threshold", () => {
       suiteSetup(async () => {
-        // Configure for multi-line threshold
+        // Configure for potential single line classes
         await vscode.workspace
           .getConfiguration()
           .update(
-            "tailwindFormatter.formatting.alwaysUseSingleLine",
+            "tailwindFormatter.lineFormatting.multiLineClasses",
             false,
             vscode.ConfigurationTarget.Global
           );
         await vscode.workspace
           .getConfiguration()
           .update(
-            "tailwindFormatter.formatting.multiLineThreshold",
+            "tailwindFormatter.lineFormatting.classLineThreshold",
             40,
             vscode.ConfigurationTarget.Global
           );
