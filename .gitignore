@@ -1,5 +1,8 @@
-out
+.vscode-test/
 dist
 node_modules
-.vscode-test/
+out
 *.vsix
+
+# Ignore post-formatted files for tests
+src/test/test-files/**/*.formatted.tsx

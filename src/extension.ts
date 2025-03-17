@@ -1,26 +1,63 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+/**
+ * extension.ts
+ *
+ * Main entry point for the extension.
+ * Handles extension lifecycle (activation/deactivation) and registration
+ * of the formatting provider and commands.
+ *
+ * Main formatting logic is delegated to the TailwindFormattingProvider class and core modules.
+ */
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+import * as vscode from "vscode";
+import { SUPPORTED_EXTENSIONS } from "./config/constants.config";
+import { TailwindFormattingProvider } from "./providers/formatting.provider";
+import { logger } from "./logger";
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "tailwind-formatter" is now active!');
+export async function activate(context: vscode.ExtensionContext) {
+  try {
+    logger.log("Tailwind Formatter extension activated");
+    logger.show();
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('tailwind-formatter.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from tailwind-formatter!');
-	});
+    const formattingProvider = new TailwindFormattingProvider();
 
-	context.subscriptions.push(disposable);
+    /* Register for supported extensions */
+    for (const extension of SUPPORTED_EXTENSIONS) {
+      const pattern = { pattern: `**/*.${extension}` };
+
+      context.subscriptions.push(
+        vscode.languages.registerDocumentFormattingEditProvider(
+          pattern,
+          formattingProvider
+        )
+      );
+
+      context.subscriptions.push(
+        vscode.languages.registerDocumentRangeFormattingEditProvider(
+          pattern,
+          formattingProvider
+        )
+      );
+    }
+
+    context.subscriptions.push(
+      vscode.commands.registerCommand(
+        "tailwind-formatter.formatTailwindClasses",
+        async () => formattingProvider.formatActiveDocument()
+      )
+    );
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    logger.error(`Failed to activate extension: ${errorMessage}`, error);
+    throw error; // Re-throw to ensure VSCode knows activation failed
+  }
 }
 
-// This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate(): void {
+  try {
+    logger.log("Tailwind Formatter extension deactivating...");
+    logger.dispose();
+  } catch (error) {
+    logger.error("Error during extension deactivation", error);
+  }
+}

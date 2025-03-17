@@ -1,49 +1,252 @@
 {
   "name": "tailwind-formatter",
-  "displayName": "tailwind-formatter",
-  "description": "A semi-opinionated and highly configurable VSCode extension that formats Tailwind CSS classes.",
-  "version": "0.0.1",
+  "displayName": "Tailwind Formatter",
+  "description": "Customizable formatting for Tailwind CSS classes",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.96.0"
   },
+  "license": "SEE LICENSE IN LICENSE.md",
+  "publisher": "Myhtica",
+  "author": {
+    "name": "Myht",
+    "email": "myht@myhtica.com"
+  },
+  "bugs": {
+    "url": "https://github.com/myhtica/tailwind-formatter/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/myhtica/tailwind-formatter.git"
+  },
+  "icon": "images/icon.jpg",
+  "preview": false,
+  "badges": [
+    {
+      "url": "https://img.shields.io/badge/PRs-welcome-brightgreen.svg",
+      "href": "https://github.com/myhtica/tailwind-formatter/pulls",
+      "description": "PRs welcome!"
+    }
+  ],
   "categories": [
+    "Formatters",
     "Other"
   ],
+  "keywords": [
+    "tailwind",
+    "formatter",
+    "classes",
+    "css",
+    "react",
+    "jsx",
+    "tsx",
+    "tailwindcss",
+    "formatting"
+  ],
+  "sponsor": {
+    "url": "https://github.com/sponsors/myhtica"
+  },
+  "pricing": "Free",
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "tailwind-formatter.helloWorld",
-        "title": "Hello World"
+        "command": "tailwind-formatter.formatTailwindClasses",
+        "title": "Format Tailwind Classes"
+      }
+    ],
+    "languages": [
+      {
+        "id": "typescriptreact",
+        "extensions": [
+          ".tsx"
+        ]
+      },
+      {
+        "id": "javascriptreact",
+        "extensions": [
+          ".jsx"
+        ]
+      }
+    ],
+    "configuration": [
+      {
+        "id": "classes",
+        "title": "Classes",
+        "order": 1,
+        "properties": {
+          "tailwindFormatter.classes.categories": {
+            "type": "object",
+            "order": 1,
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": {
+              "Layout": "container flex grid block inline hidden visible z- order- float- clear- object- overflow- overscroll-",
+              "Sizing": "w- h- min- max-",
+              "Spacing": "p- pt- pr- pb- pl- px- py- m- mt- mr- mb- ml- mx- my- space-",
+              "Typography": "text- font- leading- tracking- align- whitespace- break- placeholder-",
+              "Background": "bg- from- via- to-",
+              "Borders": "border rounded- divide-",
+              "Effects": "shadow- opacity- transition- transform- animate- cursor- pointer- resize- select- sr-"
+            },
+            "description": "Categories for grouping Tailwind CSS classes.\n\nItem is the category name, Value is a space-separated list of class names or prefixes.",
+            "markdownDescription": "Categories for grouping Tailwind CSS classes. \n\n`Item` is the category name, `Value` is a space-separated list of class names or prefixes."
+          },
+          "tailwindFormatter.classes.uncategorizedPosition": {
+            "type": "string",
+            "order": 2,
+            "enum": [
+              "beforeCategorized",
+              "afterCategorized"
+            ],
+            "default": "afterCategorized",
+            "description": "Where to place uncategorized static classes relative to categorized static classes.",
+            "markdownDescription": "Where to place uncategorized static classes relative to categorized static classes. \n\n This setting only applies to static classes, not dynamic classes.\n\n- `afterCategorized`: Place uncategorized classes after categorized ones  (default):\n\n    ```jsx\n    className={`\n      px-4 py-4 pt-2 pb-6 mt-4 mb-8   /* categorized */\n      unknown-class-1 unknown-class-2 /* uncategorized */\n    `}\n    ```\n- `beforeCategorized`: Place uncategorized classes before categorized ones:\n\n    ```jsx\n    className={`\n      unknown-class-1 unknown-class-2 /* uncategorized */\n      px-4 py-4 pt-2 pb-6 mt-4 mb-8   /* categorized */\n    `}\n    ```"
+          }
+        }
+      },
+      {
+        "id": "viewports",
+        "title": "Viewports",
+        "order": 2,
+        "properties": {
+          "tailwindFormatter.viewports.breakpoints": {
+            "type": "array",
+            "order": 1,
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "sm",
+              "md",
+              "lg",
+              "xl",
+              "2xl"
+            ],
+            "markdownDescription": "List of viewport breakpoints in order for grouping Tailwind CSS classes by.",
+            "uniqueItems": true
+          },
+          "tailwindFormatter.viewports.grouping": {
+            "type": "string",
+            "order": 2,
+            "enum": [
+              "separate",
+              "categorized",
+              "inline"
+            ],
+            "default": "separate",
+            "description": "How to group viewport-specific classes.",
+            "markdownDescription": "How to group viewport-specific classes.\n\n- `separate`: Group by viewport only (default):\n\n    ```jsx\n    className={`\n      p-4 m-2 text-sm\n      sm:p-3 sm:m-3 sm:text-base\n      lg:p-4 lg:m-4 lg:text-lg\n    `}\n    ```\n\n- `separate-categorized`: Group by viewport with categories inside each viewport:\n\n    ```jsx\n    className={`\n      p-4 m-2\n      text-sm\n      sm:p-3 sm:m-3\n      sm:text-base\n      lg:p-4 lg:m-4\n      lg:text-lg\n    `}\n    ```\n\n- `inline`: Group by category with viewport variations inline:\n\n    ```jsx\n    className={`\n      p-4 sm:p-3 lg:p-4\n      m-2 sm:m-3 lg:m-4\n      text-sm sm:text-base lg:text-lg\n    `}\n    ```"
+          }
+        }
+      },
+      {
+        "id": "formatting",
+        "title": "Formatting",
+        "order": 3,
+        "properties": {
+          "tailwindFormatter.formatting.multiLineThreshold": {
+            "type": "number",
+            "order": 1,
+            "default": 0,
+            "description": "Format classes on multiple lines when width exceeds this number. No newlines are added between classes if print width is below or equal to the threshold."
+          },
+          "tailwindFormatter.formatting.alwaysUseSingleLine": {
+            "type": "boolean",
+            "order": 2,
+            "default": false,
+            "description": "Always format classes on a single line (equivalent to setting `multiLineThreshold` to a very high number)."
+          }
+        }
+      },
+      {
+        "id": "indentation",
+        "title": "Indentation",
+        "order": 4,
+        "properties": {
+          "tailwindFormatter.indentation.usesTabs": {
+            "type": "boolean",
+            "order": 1,
+            "default": false,
+            "description": "Use tabs for indentation instead of spaces."
+          },
+          "tailwindFormatter.indentation.tabSize": {
+            "type": "number",
+            "order": 2,
+            "default": 2,
+            "description": "Number of spaces to use for indentation."
+          }
+        }
+      },
+      {
+        "id": "prettier",
+        "title": "Prettier",
+        "order": 5,
+        "properties": {
+          "tailwindFormatter.prettier.useProjectPrettierConfig": {
+            "type": "boolean",
+            "order": 1,
+            "default": true,
+            "description": "When true, uses your project's Prettier config (.prettierrc) if available. When false, uses the extension's Prettier config below.",
+            "markdownDescription": "When `true`, uses your project's Prettier config (`.prettierrc`) if available. When `false`, uses the extension's Prettier config."
+          },
+          "tailwindFormatter.prettier.config": {
+            "type": "object",
+            "order": 2,
+            "default": {
+              "parser": "typescript",
+              "printWidth": 80,
+              "quoteProps": "preserve",
+              "endOfLine": "auto"
+            },
+            "description": "Prettier configuration for the extension. \n\n This configuration must be edited in settings.json. It will also be overridden by project-level Prettier config if `tailwindFormatter.prettier.useUserConfig` is true."
+          }
+        }
       }
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run package",
-    "compile": "npm run check-types && npm run lint && node esbuild.js",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "package": "npm run check-types && npm run lint && node esbuild.js --production",
-    "compile-tests": "tsc -p . --outDir out",
-    "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
     "check-types": "tsc --noEmit",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "vscode:prepublish": "npm run package",
     "lint": "eslint src",
+    "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx}' || exit 0",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "clean-test-files": "node -e \"const{readdirSync,unlinkSync}=require('fs'),{join}=require('path');const testsDir='src/test/test-files';const cleanFormatted=(dir)=>{readdirSync(dir,{withFileTypes:true}).forEach(f=>{const p=join(dir,f.name);f.isDirectory()?cleanFormatted(p):f.name.endsWith('.formatted.tsx')&&unlinkSync(p)})};cleanFormatted(testsDir)\"",
+    "compile-tests": "tsc -p . --outDir out",
+    "pretest": "npm run clean-test-files && npm run compile-tests && npm run compile && npm run lint",
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.96.0",
+    "@types/babel__core": "^7.20.5",
+    "@types/babel__traverse": "^7.20.6",
     "@types/mocha": "^10.0.8",
     "@types/node": "20.x",
+    "@types/react": "^19.0.8",
+    "@types/vscode": "^1.96.0",
     "@typescript-eslint/eslint-plugin": "^8.7.0",
     "@typescript-eslint/parser": "^8.7.0",
-    "eslint": "^9.11.1",
-    "esbuild": "^0.24.0",
-    "npm-run-all": "^4.1.5",
-    "typescript": "^5.6.2",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "esbuild": "^0.25.1",
+    "eslint": "^9.11.1",
+    "npm-run-all": "^4.1.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "@babel/core": "^7.26.8",
+    "@babel/preset-react": "^7.26.3",
+    "@babel/preset-typescript": "^7.26.0",
+    "@babel/traverse": "^7.26.8",
+    "@babel/types": "^7.26.8",
+    "prettier": "^3.5.1"
   }
 }

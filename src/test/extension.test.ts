@@ -1,15 +1,50 @@
-import * as assert from 'assert';
+/**
+ * src/test/extension.test.ts
+ *
+ * This file contains the test suite for the Tailwind Formatter extension.
+ * It uses the Mocha testing framework to run the tests and the VSCode API
+ * to interact with the extension.
+ */
 
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
-import * as vscode from 'vscode';
-// import * as myExtension from '../../extension';
+import {
+  styles,
+  initTestSuite,
+  printSummary,
+  cleanupFormattedFiles,
+} from "../utils/test.utils";
 
-suite('Extension Test Suite', () => {
-	vscode.window.showInformationMessage('Start all tests.');
+import { registerStaticSuite } from "./tests/static.test";
+import { registerDynamicSuite } from "./tests/dynamic.test";
+import { registerResponsiveSuite } from "./tests/responsive.test";
+import { registerComplexSuite } from "./tests/complex.test";
+import { registerCategoriesSuite } from "./tests/categories.test";
+import { registerFormattingSuite } from "./tests/formatting.test";
+import { registerViewportsSuite } from "./tests/viewports.test";
+import { registerEdgeCasesSuite } from "./tests/edge-cases.test";
 
-	test('Sample test', () => {
-		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
-	});
+suite("Tailwind Formatter Test Suite", () => {
+  suiteSetup(async () => {
+    await initTestSuite();
+  });
+
+  suiteTeardown(() => {
+    printSummary();
+  });
+
+  setup(() => {
+    console.log(`${styles.blue}\n▶ Starting new test${styles.reset}`);
+  });
+
+  teardown(() => {
+    cleanupFormattedFiles();
+  });
+
+  registerStaticSuite();
+  registerDynamicSuite();
+  registerResponsiveSuite();
+  registerComplexSuite();
+  registerCategoriesSuite();
+  registerFormattingSuite();
+  registerViewportsSuite();
+  registerEdgeCasesSuite();
 });

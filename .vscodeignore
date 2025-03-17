@@ -1,8 +1,7 @@
 .vscode/**
 .vscode-test/**
-out/**
-node_modules/**
 src/**
+out/**
 .gitignore
 .yarnrc
 esbuild.js
@@ -12,3 +11,7 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+
+# DON'T ignore these dependencies, they need to be bundled with the extension
+!node_modules/@babel/**
+!node_modules/prettier/**
