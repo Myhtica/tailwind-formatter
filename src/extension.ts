@@ -5,7 +5,7 @@
  * Handles extension lifecycle (activation/deactivation) and registration
  * of the formatting provider and commands.
  *
- * Main formatting logic is delegated to the TailwindFormattingProvider class and core modules.
+ * Main formatting logic is delegated to the provider and core modules.
  */
 
 import * as vscode from "vscode";
@@ -20,7 +20,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const formattingProvider = new TailwindFormattingProvider();
 
-    /* Register for supported extensions */
     for (const extension of SUPPORTED_EXTENSIONS) {
       const pattern = { pattern: `**/*.${extension}` };
 
