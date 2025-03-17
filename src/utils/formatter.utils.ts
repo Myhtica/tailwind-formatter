@@ -1,12 +1,12 @@
 /**
  * utils/formatter.utils.ts
  *
- * Utilities for formatting Tailwind CSS classes in JSX/TSX.
+ * Utilities for formatting Tailwind CSS classes.
  */
 
-import * as vscode from "vscode";
 import * as t from "@babel/types";
 import { FormatterConfig } from "../types";
+import { logger } from "../logger";
 
 /**
  * Gets the className/class node in a JSX element.
@@ -101,51 +101,134 @@ export function getIndentationLevels(
 }
 
 /**
- * Formats the text using a Prettier configuration.
+ * Formats the text using Prettier.
+ * If Prettier fails, logs a warning and returns the original text.
  *
  * @param text - Text to format
  * @param prettierConfig - Prettier configuration options
- * @returns Final formatted document text
+ * @returns Prettier-formatted text, or original text if formatting fails
  */
 export async function formatWithPrettier(
   text: string,
   prettierConfig: Record<string, any>
-): Promise<string | null> {
+): Promise<string> {
   try {
     const prettier = require("prettier");
-    return await prettier.format(text, prettierConfig);
+    const formattedText = await prettier.format(text, prettierConfig);
+
+    if (!formattedText) {
+      logger.warn(
+        "Prettier returned null result. Using Tailwind-only formatting"
+      );
+      return text;
+    }
+
+    return formattedText;
   } catch (error) {
-    throw new Error(`Prettier formatting failed: ${error}`);
+    logger.warn(
+      `Prettier formatting failed: ${error}. Using Tailwind-only formatting`
+    );
+    return text;
   }
 }
 
 /**
- * Checks if the classes should be formatted in a single line.
+ * Determines if Tailwind classes should be formatted on multiple lines based on configuration.
  *
- * @param classes - Array of classes to check
+ * @param classGroups - Array of class groups to format
  * @param formatterConfig - Formatter configuration
- * @returns Whether to format in a single line
+ * @returns Whether to format Tailwind Classes on multiple lines
  */
-export function shouldUseSingleLine(
-  classContent: string,
+export function shouldFormatClassesMultiline(
+  classGroups: string[],
   formatterConfig: FormatterConfig
 ): boolean {
-  if (formatterConfig.alwaysUseSingleLine) {
+  if (formatterConfig.multiLineClasses) {
     return true;
   }
 
   /* Remove existing newlines and extra spaces to get true content length */
+  const classContent = classGroups.join(" ");
   const normalizedContent = classContent.replace(/[\n\s]+/g, " ").trim();
-  return normalizedContent.length <= formatterConfig.multiLineThreshold;
+
+  return normalizedContent.length > formatterConfig.multiLineClassThreshold;
 }
 
 /**
- * Fixes indentation of className attributes in the text.
+ * Gets the formatted content for a group of Tailwind classes.
+ * This will format the classes on multiple lines if necessary.
  *
- * Ensures consistent indentation structure:
- * - className=" at base indent
- * - content at base indent + 1 level using configured indentation
- * - closing wrapper at base indent
+ * @param classGroups - Array of class groups to format
+ * @param classIndent - Indentation for classes
+ * @param formatClassesMultiline - Whether to format on multiple lines
+ * @returns Formatted Tailwind class content
+ */
+export function getFormattedClasses(
+  classGroups: string[],
+  classIndent: string,
+  formatClassesMultiline: boolean
+): string {
+  return formatClassesMultiline
+    ? classGroups.map((group) => `${classIndent}${group}`).join("\n")
+    : classGroups.join(" ").trim();
+}
+
+/**
+ * Determines if attributes should be formatted on multiple lines based on configuration.
+ *
+ * @param attributeTexts - Array of attribute texts to format
+ * @param formatterConfig - Formatter configuration
+ * @returns Whether to format non-className attributes on multiple lines
+ */
+export function shouldFormatAttributesMultiline(
+  attributeTexts: string[],
+  formatterConfig: FormatterConfig
+): boolean {
+  if (formatterConfig.multiLineAttributes) {
+    return true;
+  }
+
+  const attributeContent = attributeTexts.join(" ");
+  return attributeContent.length > formatterConfig.multiLineAttributeThreshold;
+}
+
+/**
+ * Gets the formatted content for non-class attributes.
+ * This will format the attributes on multiple lines if necessary.
+ *
+ * @param attributeTexts - Array of attribute texts to format
+ * @param attrIndent - Indentation for attributes
+ * @param formatterConfig - Formatter configuration
+ * @returns Formatted non-class attribute content or empty string if no attributes
+ */
+export function getFormattedNonClassAttributes(
+  attributeTexts: string[],
+  attrIndent: string,
+  formatterConfig: FormatterConfig
+): string {
+  if (!attributeTexts.length) {
+    return "";
+  }
+
+  const formatAttributesMultiline = shouldFormatAttributesMultiline(
+    attributeTexts,
+    formatterConfig
+  );
+
+  if (formatAttributesMultiline) {
+    return attributeTexts
+      .map((attrText) => `\n${attrIndent}${attrText}`)
+      .join("");
+  }
+
+  return attributeTexts.map((attrText) => ` ${attrText}`).join("");
+}
+
+/**
+ * Fixes indentation of className attributes in the text (multi-line values only).
+ *
+ * This is necessary because Prettier does not handle indentation of class names and
+ * can cause inconsistent formatting.
  *
  * @param text - The text to fix indentation for
  * @param formatterConfig - Formatter configuration
@@ -160,10 +243,11 @@ export function fixClassNameIndentation(
     : " ".repeat(formatterConfig.tabSize);
 
   /* Regex to match className attributes with multi-line values
-   * Captures:
-   * (1) leading whitespace (2) attribute name+opening quote
-   * (3) indent before content (4) attribute content
-   * (5) indent before closing quote (6) closing quote
+   * (ignores single-lines). The regex captures the following groups:
+   *
+   * (1) leading whitespace            (2) attribute name + opening wrapper
+   * (3) indent before content         (4) attribute content
+   * (5) indent before closing wrapper (6) closing wrapper
    */
   const classNameRegex =
     /^(\s*)(className=["'{`])\n(\s*)(.+?)\n(\s*)(["'`}])/gms;
