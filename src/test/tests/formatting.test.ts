@@ -27,8 +27,8 @@ export function registerFormattingSuite() {
       await vscode.workspace
         .getConfiguration()
         .update(
-          "tailwindFormatter.lineFormatting.classLineThreshold",
-          originalConfig.get("lineFormatting.classLineThreshold"),
+          "tailwindFormatter.lineFormatting.multiLineClassThreshold",
+          originalConfig.get("lineFormatting.multiLineClassThreshold"),
           vscode.ConfigurationTarget.Global
         );
       await vscode.workspace
@@ -41,8 +41,8 @@ export function registerFormattingSuite() {
       await vscode.workspace
         .getConfiguration()
         .update(
-          "tailwindFormatter.lineFormatting.attributeLineThreshold",
-          originalConfig.get("lineFormatting.attributeLineThreshold"),
+          "tailwindFormatter.lineFormatting.multiLineAttributeThreshold",
+          originalConfig.get("lineFormatting.multiLineAttributeThreshold"),
           vscode.ConfigurationTarget.Global
         );
     });
@@ -59,7 +59,7 @@ export function registerFormattingSuite() {
         await vscode.workspace
           .getConfiguration()
           .update(
-            "tailwindFormatter.lineFormatting.classLineThreshold",
+            "tailwindFormatter.lineFormatting.multiLineClassThreshold",
             999,
             vscode.ConfigurationTarget.Global
           );
@@ -107,7 +107,7 @@ export function registerFormattingSuite() {
         await vscode.workspace
           .getConfiguration()
           .update(
-            "tailwindFormatter.lineFormatting.classLineThreshold",
+            "tailwindFormatter.lineFormatting.multiLineClassThreshold",
             40,
             vscode.ConfigurationTarget.Global
           );
