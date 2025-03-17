@@ -1,8 +1,8 @@
 /**
  * core/formatter.core.ts
  *
- * Formatter for formatting JSX/TSX elements containing Tailwind CSS classes.
- * Processes class attributes, maintains indentation, and formats classes based on configuration.
+ * Core formatting logic for the Tailwind CSS class formatter extension.
+ * Handles parsing, categorizing, and formatting Tailwind CSS classes in JSX elements.
  */
 
 import * as t from "@babel/types";
@@ -17,7 +17,9 @@ import {
   getJSXWrappers,
   getIndentationLevels,
   formatWithPrettier,
-  shouldUseSingleLine,
+  shouldFormatClassesMultiline,
+  getFormattedNonClassAttributes,
+  getFormattedClasses,
   fixClassNameIndentation,
 } from "../utils/formatter.utils";
 
@@ -26,45 +28,42 @@ import {
  *
  * @param text - Selected text to format
  * @param formatterConfig - Configuration for the formatter
- * @param isRangeFormatting - Flag indicating if the text is being formatted as a range
+ * @param isFullDocumentFormatting - Flag indicating if formatting an entire document (true) or just a range (false)
  * @returns Formatted text or null if formatting fails
  *
  */
 export async function formatText(
   text: string,
   formatterConfig: FormatterConfig,
-  isFullDocumentFormatting: boolean = true
+  isFullDocumentFormatting: boolean
 ): Promise<string | null> {
   const formattedText = await formatTailwindClasses(text, formatterConfig);
   if (!formattedText) {
     throw new Error("Failed to format Tailwind classes");
   }
 
-  /* Skip Prettier and post-formatting if not full document formatting as Prettier does
-     not have access to entire document scope and will cause multiple formatting errors */
+  /* Skip Prettier for partial document formatting to avoid formatting errors
+     caused by Prettier not having full document context */
   if (!isFullDocumentFormatting) {
     return formattedText;
   }
 
-  const PrettierFormattedText = await formatWithPrettier(
+  const prettierFormattedText = await formatWithPrettier(
     formattedText,
     formatterConfig.prettierConfig
   );
-  if (!PrettierFormattedText) {
-    throw new Error("Failed to apply prettier formatting");
-  }
 
   /* If the text did not change, no need for post-processing */
-  if (PrettierFormattedText === text) {
-    return PrettierFormattedText;
+  if (prettierFormattedText === formattedText) {
+    return prettierFormattedText;
   }
 
-  /* Fix indentation in case Prettier formatting changes it */
-  return fixClassNameIndentation(PrettierFormattedText, formatterConfig);
+  /* Post-processing in case Prettier changes the formatting */
+  return fixClassNameIndentation(prettierFormattedText, formatterConfig);
 }
 
 /**
- * Formats tailwind classes in the text.
+ * Formats Tailwind classes in the text.
  *
  * @param text - Selected text to format
  * @param formatterConfig - Configuration for the formatter
@@ -217,8 +216,6 @@ function constructFormattedJSXElement(
   );
   const elementSuffix = elementNode.selfClosing ? "/>" : ">";
 
-  const classNameAttr = classNameNode.name.name;
-  const nonClassNameAttributes = getNonClassAttributes(elementNode);
   const { openingWrapper, closingWrapper } = getJSXWrappers(
     classNameNode.value
   );
@@ -228,23 +225,31 @@ function constructFormattedJSXElement(
     formatterConfig.tabSize
   );
 
-  const rawClassContent = classGroups.join(" ");
-  const useSingleLine = shouldUseSingleLine(rawClassContent, formatterConfig);
+  const classNameAttr = classNameNode.name.name;
+  const nonClassNameAttributes = getNonClassAttributes(elementNode);
+  const attributesText = nonClassNameAttributes.map((attr) =>
+    sourceText.slice(attr.start!, attr.end!).trim()
+  );
+  const formattedNonClassAttributes = getFormattedNonClassAttributes(
+    attributesText,
+    attrIndent,
+    formatterConfig
+  );
 
-  /* Format classes based on single-line or multi-line mode */
-  const formattedClasses = useSingleLine
-    ? classGroups.join(" ").trim()
-    : classGroups.map((group) => `${classIndent}${group}`).join("\n");
+  const formatClassesMultiline = shouldFormatClassesMultiline(
+    classGroups,
+    formatterConfig
+  );
+  const formattedClasses = getFormattedClasses(
+    classGroups,
+    classIndent,
+    formatClassesMultiline
+  );
 
   /* Construct the formatted element string */
-  let formattedElementString = elementPrefix;
+  let formattedElementString = elementPrefix + formattedNonClassAttributes;
 
-  nonClassNameAttributes.forEach((attr) => {
-    const attributeText = sourceText.slice(attr.start!, attr.end!);
-    formattedElementString += `\n${attrIndent}${attributeText}`;
-  });
-
-  if (useSingleLine) {
+  if (!formatClassesMultiline) {
     formattedElementString += `\n${attrIndent}${classNameAttr}=${openingWrapper}${formattedClasses}${closingWrapper}`;
   } else {
     formattedElementString += `\n${attrIndent}${classNameAttr}=${openingWrapper}\n`;
