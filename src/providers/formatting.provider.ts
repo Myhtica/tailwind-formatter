@@ -1,9 +1,7 @@
 /**
  * /providers/formatting.provider.ts
  *
- * VSCode formatting provider for Tailwind classes.
- * Supports Format Document, Format Selection, and format on save commands
- *
+ * Formatting provider for Tailwind classes.
  */
 
 import * as vscode from "vscode";
@@ -14,8 +12,8 @@ import { logger } from "../logger";
 import { formatText } from "../core/formatter.core";
 
 /**
- * VSCode formatting provider for Tailwind classes
- * Implements document and range formatting capabilities
+ * VS Code formatting provider for Tailwind classes.
+ * Implements document and range formatting capabilities.
  */
 export class TailwindFormattingProvider
   implements
@@ -25,7 +23,7 @@ export class TailwindFormattingProvider
   private configManager = FormatterConfigManager.getInstance();
 
   /**
-   * Validates if the document can be formatted
+   * Validates if the document can be formatted.
    *
    * @param document The document to validate
    * @returns Validation result
@@ -39,16 +37,11 @@ export class TailwindFormattingProvider
       };
     }
 
-    const documentText = document.getText();
-    if (documentText.trim().length === 0) {
-      return { ok: false, error: "The document is empty." };
-    }
-
     return { ok: true };
   }
 
   /**
-   * Formats the document text using the formatter configuration
+   * Formats the range of text in the document.
    *
    * @param document The document containing the text
    * @param range The range to format
@@ -67,7 +60,17 @@ export class TailwindFormattingProvider
       }
 
       const documentText = document.getText(range);
+      if (documentText.trim().length === 0) {
+        return { ok: true, value: documentText };
+      }
+
       const formatterConfig = await this.configManager.getConfig(document);
+      if (!formatterConfig) {
+        return {
+          ok: false,
+          error: "Failed to load formatter configuration",
+        };
+      }
 
       const formattedText = await formatText(
         documentText,
@@ -92,12 +95,12 @@ export class TailwindFormattingProvider
   }
 
   /**
-   * Format the entire document
+   * Format the entire document.
    *
    * @param document The document to format
    * @returns Array of text edits to apply, or empty array if formatting failed
    */
-  private async formatDocument(
+  private async formatEntireDocument(
     document: vscode.TextDocument
   ): Promise<vscode.TextEdit[]> {
     const fullDocumentRange = new vscode.Range(
@@ -110,7 +113,6 @@ export class TailwindFormattingProvider
       fullDocumentRange,
       true
     );
-
     if (!formattedText.ok) {
       vscode.window.showErrorMessage(formattedText.error);
       return [];
@@ -120,7 +122,7 @@ export class TailwindFormattingProvider
   }
 
   /**
-   * Formats the entire document using the active editor
+   * Formats the entire document using the active editor.
    *
    * @returns True if formatting was successful, false otherwise
    */
@@ -131,8 +133,7 @@ export class TailwindFormattingProvider
       return false;
     }
 
-    const edits = await this.formatDocument(editor.document);
-
+    const edits = await this.formatEntireDocument(editor.document);
     if (edits.length === 0) {
       return false;
     }
@@ -140,7 +141,6 @@ export class TailwindFormattingProvider
     const formatSuccessful = await editor.edit((builder) => {
       edits.forEach((edit) => builder.replace(edit.range, edit.newText));
     });
-
     if (formatSuccessful) {
       vscode.window.showInformationMessage("Tailwind classes formatted!");
     }
@@ -149,18 +149,23 @@ export class TailwindFormattingProvider
   }
 
   /**
-   * Provides formatting edits for the entire document
+   * Provides formatting edits for the entire document.
+   *
+   * @param document The document to format
+   * @param options Formatting options
+   * @param token Cancellation token
+   * @returns Array of text edits to apply
    */
   public async provideDocumentFormattingEdits(
     document: vscode.TextDocument,
     options: vscode.FormattingOptions,
     token: vscode.CancellationToken
   ): Promise<vscode.TextEdit[]> {
-    return this.formatDocument(document);
+    return this.formatEntireDocument(document);
   }
 
   /**
-   * Provides formatting edits for the selected range
+   * Provides formatting edits for the selected range in the document.
    *
    * @param document The document containing the range
    * @param range The range to format
