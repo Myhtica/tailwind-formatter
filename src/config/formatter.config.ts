@@ -59,13 +59,20 @@ export class FormatterConfigManager {
   ): Promise<FormatterConfig> {
     try {
       this.getStaticConfig(document);
+      if (!this.staticConfig) {
+        throw new Error("Failed to get static configuration");
+      }
+
       const prettierConfig = await this.getPrettierConfig(document);
+      if (!prettierConfig) {
+        throw new Error("Failed to get Prettier configuration");
+      }
 
       return {
         ...this.staticConfig!,
         prettierConfig,
-        usesTabs: prettierConfig.useTabs ?? this.staticConfig!.usesTabs,
-        tabSize: prettierConfig.tabWidth ?? this.staticConfig!.tabSize,
+        usesTabs: prettierConfig.useTabs ?? this.staticConfig.usesTabs,
+        tabSize: prettierConfig.tabWidth ?? this.staticConfig.tabSize,
       };
     } catch (error) {
       throw new Error(`Failed to get formatter config: ${error}`);
@@ -74,7 +81,7 @@ export class FormatterConfigManager {
 
   /**
    * Initializes or returns cached static configuration.
-   * Includes babel config, categories, viewports, and formatting options.
+   * Includes babel config, categories, viewports, and other formatting options.
    */
   private getStaticConfig(document: vscode.TextDocument): void {
     if (this.staticConfig) {
@@ -82,7 +89,7 @@ export class FormatterConfigManager {
     }
 
     const config = vscode.workspace.getConfiguration("tailwindFormatter");
-    const extension = document.fileName.split(".").pop();
+    const extension = document.fileName.split(".").pop() || "";
 
     const babelConfig = FILE_CONFIGS[extension as keyof typeof FILE_CONFIGS];
     if (!babelConfig) {
@@ -93,18 +100,32 @@ export class FormatterConfigManager {
 
     this.staticConfig = {
       babelConfig,
+
       categories: config.get("classes.categories") as Record<string, string>,
       uncategorizedPosition: config.get("classes.uncategorizedPosition") as
         | "beforeCategorized"
         | "afterCategorized",
+
       viewports: config.get("viewports.breakpoints") as string[],
       viewportGrouping: config.get("viewports.grouping") as
         | "separate"
+        | "separate-categorized"
         | "inline",
-      multiLineThreshold: config.get("formatting.multiLineThreshold") as number,
-      alwaysUseSingleLine: config.get(
-        "formatting.alwaysUseSingleLine"
+
+      multiLineClasses: config.get(
+        "lineFormatting.multiLineClasses"
       ) as boolean,
+      multiLineClassThreshold: config.get(
+        "lineFormatting.classLineThreshold"
+      ) as number,
+
+      multiLineAttributes: config.get(
+        "lineFormatting.multiLineAttributes"
+      ) as boolean,
+      multiLineAttributeThreshold: config.get(
+        "lineFormatting.attributeLineThreshold"
+      ) as number,
+
       usesTabs: config.get("indentation.usesTabs") as boolean,
       tabSize: config.get("indentation.tabSize") as number,
     };
@@ -159,7 +180,7 @@ export class FormatterConfigManager {
     /* Fallback to extension config or defaults  */
     return {
       ...DEFAULT_PRETTIER_CONFIG,
-      ...(extensionPrettierConfig ?? {}),
+      ...(extensionPrettierConfig ?? {}), // merge with default config if present
       useTabs: usesTabs,
       tabWidth: tabSize,
     };
