@@ -1,9 +1,7 @@
 /**
  * src/test/extension.test.ts
  *
- * This file contains the test suite for the Tailwind Formatter extension.
- * It uses the Mocha testing framework to run the tests and the VSCode API
- * to interact with the extension.
+ * Main test suite for the Tailwind CSS class formatter extension. Registers all test suites.
  */
 
 import {
@@ -18,8 +16,8 @@ import { registerDynamicSuite } from "./tests/dynamic.test";
 import { registerResponsiveSuite } from "./tests/responsive.test";
 import { registerComplexSuite } from "./tests/complex.test";
 import { registerCategoriesSuite } from "./tests/categories.test";
-import { registerFormattingSuite } from "./tests/formatting.test";
 import { registerViewportsSuite } from "./tests/viewports.test";
+import { registerLineFormattingSuite } from "./tests/line-formatting.test";
 import { registerEdgeCasesSuite } from "./tests/edge-cases.test";
 
 suite("Tailwind Formatter Test Suite", () => {
@@ -39,12 +37,13 @@ suite("Tailwind Formatter Test Suite", () => {
     cleanupFormattedFiles();
   });
 
+  /* Register all test suites below */
   registerStaticSuite();
   registerDynamicSuite();
   registerResponsiveSuite();
   registerComplexSuite();
   registerCategoriesSuite();
-  registerFormattingSuite();
   registerViewportsSuite();
+  registerLineFormattingSuite();
   registerEdgeCasesSuite();
 });
