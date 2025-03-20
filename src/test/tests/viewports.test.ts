@@ -1,7 +1,7 @@
 /**
  * src/test/suites/viewports.test.ts
  *
- * Tests for different formatting configurations
+ * Tests for different viewport configuration options
  */
 
 import * as vscode from "vscode";
@@ -50,28 +50,28 @@ export function registerViewportsSuite() {
 
       test("Basic viewport classes in separate groups", async () => {
         const result = await formatAndCompare(
-          "viewport-separate/separate-basic.tsx"
+          "viewports/viewport-separate/separate-basic.tsx"
         );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Multiple viewport breakpoints in order", async () => {
         const result = await formatAndCompare(
-          "viewport-separate/separate-multiple.tsx"
+          "viewports/viewport-separate/separate-multiple.tsx"
         );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Mixed base and viewport classes", async () => {
         const result = await formatAndCompare(
-          "viewport-separate/separate-mixed.tsx"
+          "viewports/viewport-separate/separate-mixed.tsx"
         );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Complex viewport formatting with categories", async () => {
         const result = await formatAndCompare(
-          "viewport-separate/separate-categories.tsx"
+          "viewports/viewport-separate/separate-categories.tsx"
         );
         assert.strictEqual(result.actual, result.expected);
       });
@@ -94,28 +94,28 @@ export function registerViewportsSuite() {
 
       test("Basic viewport classes inline grouped", async () => {
         const result = await formatAndCompare(
-          "viewport-inline/inline-basic.tsx"
+          "viewports/viewport-inline/inline-basic.tsx"
         );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Multiple viewport breakpoints inline", async () => {
         const result = await formatAndCompare(
-          "viewport-inline/inline-multiple.tsx"
+          "viewports/viewport-inline/inline-multiple.tsx"
         );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Mixed base and viewport classes inline", async () => {
         const result = await formatAndCompare(
-          "viewport-inline/inline-mixed.tsx"
+          "viewports/viewport-inline/inline-mixed.tsx"
         );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Complex viewport formatting with categories inline", async () => {
         const result = await formatAndCompare(
-          "viewport-inline/inline-categories.tsx"
+          "viewports/viewport-inline/inline-categories.tsx"
         );
         assert.strictEqual(result.actual, result.expected);
       });

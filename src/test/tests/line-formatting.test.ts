@@ -48,25 +48,31 @@ export function registerLineFormattingSuite() {
         console.log("");
       });
 
-      test("Simple classes forced to multi-line", async () => {
-        const result = await formatAndCompare("always-multi-line/simple.tsx");
+      test("Basic classes forced to multi-line", async () => {
+        const result = await formatAndCompare(
+          "line-formatting/always-multi-line/basic.tsx"
+        );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Long classes on multi-line", async () => {
         const result = await formatAndCompare(
-          "always-multi-line/long-classes.tsx"
+          "line-formatting/always-multi-line/long-classes.tsx"
         );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Dynamic classes on multi-line", async () => {
-        const result = await formatAndCompare("always-multi-line/dynamic.tsx");
+        const result = await formatAndCompare(
+          "line-formatting/always-multi-line/dynamic.tsx"
+        );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Multiple elements all multi-line", async () => {
-        const result = await formatAndCompare("always-multi-line/multiple.tsx");
+        const result = await formatAndCompare(
+          "line-formatting/always-multi-line/multiple.tsx"
+        );
         assert.strictEqual(result.actual, result.expected);
       });
     });
@@ -92,25 +98,29 @@ export function registerLineFormattingSuite() {
       });
 
       test("Basic classes always single line", async () => {
-        const result = await formatAndCompare("always-single-line/basic.tsx");
+        const result = await formatAndCompare(
+          "line-formatting/always-single-line/basic.tsx"
+        );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Long classes forced to single line", async () => {
         const result = await formatAndCompare(
-          "always-single-line/long-classes.tsx"
+          "line-formatting/always-single-line/long-classes.tsx"
         );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Dynamic classes on single line", async () => {
-        const result = await formatAndCompare("always-single-line/dynamic.tsx");
+        const result = await formatAndCompare(
+          "line-formatting/always-single-line/dynamic.tsx"
+        );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Multiple elements all single line", async () => {
         const result = await formatAndCompare(
-          "always-single-line/multiple.tsx"
+          "line-formatting/always-single-line/multiple.tsx"
         );
         assert.strictEqual(result.actual, result.expected);
       });
@@ -140,22 +150,30 @@ export function registerLineFormattingSuite() {
       });
 
       test("Short classes stay single line", async () => {
-        const result = await formatAndCompare("threshold/short.tsx");
+        const result = await formatAndCompare(
+          "line-formatting/line-threshold/short.tsx"
+        );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Classes over threshold split to multiple lines", async () => {
-        const result = await formatAndCompare("threshold/long.tsx");
+        const result = await formatAndCompare(
+          "line-formatting/line-threshold/long.tsx"
+        );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Dynamic classes respect threshold", async () => {
-        const result = await formatAndCompare("threshold/dynamic.tsx");
+        const result = await formatAndCompare(
+          "line-formatting/line-threshold/dynamic.tsx"
+        );
         assert.strictEqual(result.actual, result.expected);
       });
 
       test("Mixed length elements respect threshold", async () => {
-        const result = await formatAndCompare("threshold/mixed.tsx");
+        const result = await formatAndCompare(
+          "line-formatting/line-threshold/mixed.tsx"
+        );
         assert.strictEqual(result.actual, result.expected);
       });
     });
