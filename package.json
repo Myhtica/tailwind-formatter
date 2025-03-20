@@ -221,8 +221,7 @@
     "clean-test-files": "node -e \"const{readdirSync,unlinkSync}=require('fs'),{join}=require('path');const testsDir='src/test/test-files';const cleanFormatted=(dir)=>{readdirSync(dir,{withFileTypes:true}).forEach(f=>{const p=join(dir,f.name);f.isDirectory()?cleanFormatted(p):f.name.endsWith('.formatted.tsx')&&unlinkSync(p)})};cleanFormatted(testsDir)\"",
     "compile-tests": "tsc -p . --outDir out",
     "pretest": "npm run clean-test-files && npm run compile-tests && npm run compile && npm run lint",
-    "test": "vscode-test",
-    "test-in-browser": "vscode-test-web --extensionDevelopmentPath=. ."
+    "test": "vscode-test"
   },
   "devDependencies": {
     "@types/babel__core": "^7.20.5",
