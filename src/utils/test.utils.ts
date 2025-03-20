@@ -89,6 +89,9 @@ export function printSummary() {
 
 /**
  * Normalizes text for comparison by removing comments and normalizing line endings.
+ *
+ * @param text - Text to normalize
+ * @returns Normalized text
  */
 export function normalizeText(text: string): string {
   // Remove single-line comments
@@ -101,6 +104,11 @@ export function normalizeText(text: string): string {
 
 /**
  * Formats and compares a test file with its expected result.
+ *
+ * @param testFile - Test file to format and compare
+ * @returns Object containing actual and expected formatted text
+ * @throws Error if an error occurs during processing
+ * @returns Object containing actual and expected formatted text
  */
 export async function formatAndCompare(testFile: string) {
   console.log(`${styles.yellow}  ├── Processing: ${testFile}${styles.reset}`);
@@ -151,6 +159,11 @@ export async function formatAndCompare(testFile: string) {
 
 /**
  * Simulates range formatting in a document.
+ *
+ * @param content - Content to format
+ * @param rangeStart - Start of the range to format
+ * @param rangeEnd - End of the range to format
+ * @returns Formatted text edits
  */
 export async function testRangeFormatting(
   content: string,
@@ -179,6 +192,7 @@ export async function testRangeFormatting(
 
 /**
  * Cleans up formatted files in the test-files directory.
+ *
  */
 export function cleanupFormattedFiles() {
   if (CLEAN_UP_FORMATTED_FILES) {
