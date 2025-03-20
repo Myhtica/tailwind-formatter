@@ -158,18 +158,6 @@
             "order": 2,
             "default": 40,
             "description": "Format Tailwind classes on multiple lines when width exceeds this number. Only applies when `multiLineClasses` is false. Set to a high number to always place classes on a single line."
-          },
-          "tailwindFormatter.lineFormatting.multiLineAttributes": {
-            "type": "boolean",
-            "order": 3,
-            "default": true,
-            "description": "When true, non-class/className attributes (e.g. key, aria-label, etc.) are always formatted on multiple lines. When false, attributes may be placed on a single line if under the threshold length."
-          },
-          "tailwindFormatter.lineFormatting.multiLineAttributeThreshold": {
-            "type": "number",
-            "order": 4,
-            "default": 40,
-            "description": "Format non-class/className attributes (e.g. key, aria-label, etc.) on multiple lines when total width exceeds this number. Only applies when `multiLineAttributes` is false. Set to a high number to always place attributes on a single line."
           }
         }
       },
