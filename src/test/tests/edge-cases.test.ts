@@ -1,7 +1,7 @@
 /**
  * src/test/suite/edge-cases.test.ts
  *
- * Tests for edge cases and range formatting
+ * Tests for edge cases and bugs in the formatter
  */
 
 import * as assert from "assert";
@@ -14,7 +14,7 @@ import {
 export function registerEdgeCasesSuite() {
   suite("Edge Cases", () => {
     test("Single-line edge case", async () => {
-      const result = await formatAndCompare("edge-case/single-line-bug.tsx");
+      const result = await formatAndCompare("edge-cases/single-line-bug.tsx");
       assert.strictEqual(result.actual, result.expected);
     });
   });
@@ -66,6 +66,11 @@ export function registerEdgeCasesSuite() {
         testStats.failed++;
         throw error;
       }
+    });
+
+    test("Dynamic classes have correct spacing", async () => {
+      const result = await formatAndCompare("edge-cases/dynamic-bug.tsx");
+      assert.strictEqual(result.actual, result.expected);
     });
   });
 }
