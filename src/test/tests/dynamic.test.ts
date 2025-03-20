@@ -1,7 +1,7 @@
 /**
  * src/test/suites/dynamic.test.ts
  *
- * Tests for dynamic Tailwind class formatting
+ * Tests for dynamic Tailwind CSS classes
  */
 
 import * as assert from "assert";

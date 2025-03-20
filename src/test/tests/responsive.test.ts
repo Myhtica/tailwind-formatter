@@ -1,7 +1,7 @@
 /**
  * src/test/suites/responsive.test.ts
  *
- * Tests for responsive Tailwind class formatting
+ * Tests for responsive Tailwind CSS classes
  */
 
 import * as assert from "assert";

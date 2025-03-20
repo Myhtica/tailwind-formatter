@@ -1,7 +1,7 @@
 /**
  * src/test/suites/complex.test.ts
  *
- * Tests for complex Tailwind class formatting
+ * Tests for complex class combinations
  */
 
 import * as assert from "assert";

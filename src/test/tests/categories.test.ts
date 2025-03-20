@@ -1,7 +1,7 @@
 /**
  * src/test/suites/categories.test.ts
  *
- * Tests for categories Tailwind class formatting
+ * Tests for Tailwind CSS class categories
  */
 
 import * as assert from "assert";
