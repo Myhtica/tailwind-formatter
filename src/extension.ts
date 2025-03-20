@@ -15,7 +15,6 @@ import { logger } from "./logger";
 
 export async function activate(context: vscode.ExtensionContext) {
   try {
-    logger.log("Tailwind Formatter extension activated");
     logger.show();
 
     const formattingProvider = new TailwindFormattingProvider();
