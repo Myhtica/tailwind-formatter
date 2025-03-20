@@ -218,10 +218,10 @@ export function fixClassNameIndentation(
    * (1) leading whitespace            (2) attribute name + opening wrapper
    * (3) indent before content         (4) attribute content
    * (5) indent before closing wrapper (6) closing wrapper
+   *
    */
   const classNameRegex =
-    /^(\s*)(className=["'{`])\n(\s*)(.+?)\n(\s*)(["'`}])/gms;
-
+    /^(\s*)(className=(?:["']|\{`))\n(\s*)(.+?)\n(\s*)(["']|`\})/gms;
   return text.replace(
     classNameRegex,
     (
