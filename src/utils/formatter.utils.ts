@@ -174,54 +174,24 @@ export function getFormattedClasses(
 }
 
 /**
- * Determines if attributes should be formatted on multiple lines based on configuration.
- *
- * @param attributeTexts - Array of attribute texts to format
- * @param formatterConfig - Formatter configuration
- * @returns Whether to format non-className attributes on multiple lines
- */
-export function shouldFormatAttributesMultiline(
-  attributeTexts: string[],
-  formatterConfig: FormatterConfig
-): boolean {
-  if (formatterConfig.multiLineAttributes) {
-    return true;
-  }
-
-  const attributeContent = attributeTexts.join(" ");
-  return attributeContent.length > formatterConfig.multiLineAttributeThreshold;
-}
-
-/**
- * Gets the formatted content for non-class attributes.
- * This will format the attributes on multiple lines if necessary.
+ * Gets the formatted content for non-class attributes (e.g., `key`, `ref`, etc.).
+ * This will always format the attributes on multiple lines.
  *
  * @param attributeTexts - Array of attribute texts to format
  * @param attrIndent - Indentation for attributes
- * @param formatterConfig - Formatter configuration
  * @returns Formatted non-class attribute content or empty string if no attributes
  */
 export function getFormattedNonClassAttributes(
   attributeTexts: string[],
-  attrIndent: string,
-  formatterConfig: FormatterConfig
+  attrIndent: string
 ): string {
   if (!attributeTexts.length) {
     return "";
   }
 
-  const formatAttributesMultiline = shouldFormatAttributesMultiline(
-    attributeTexts,
-    formatterConfig
-  );
-
-  if (formatAttributesMultiline) {
-    return attributeTexts
-      .map((attrText) => `\n${attrIndent}${attrText}`)
-      .join("");
-  }
-
-  return attributeTexts.map((attrText) => ` ${attrText}`).join("");
+  return attributeTexts
+    .map((attrText) => `\n${attrIndent}${attrText}`)
+    .join("");
 }
 
 /**

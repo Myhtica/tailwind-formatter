@@ -119,13 +119,6 @@ export class FormatterConfigManager {
         "lineFormatting.multiLineClassThreshold"
       ) as number,
 
-      multiLineAttributes: config.get(
-        "lineFormatting.multiLineAttributes"
-      ) as boolean,
-      multiLineAttributeThreshold: config.get(
-        "lineFormatting.multiLineAttributeThreshold"
-      ) as number,
-
       usesTabs: config.get("indentation.usesTabs") as boolean,
       tabSize: config.get("indentation.tabSize") as number,
     };

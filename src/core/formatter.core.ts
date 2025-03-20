@@ -232,8 +232,7 @@ function constructFormattedJSXElement(
   );
   const formattedNonClassAttributes = getFormattedNonClassAttributes(
     attributesText,
-    attrIndent,
-    formatterConfig
+    attrIndent
   );
 
   const formatClassesMultiline = shouldFormatClassesMultiline(

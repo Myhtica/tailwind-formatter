@@ -67,12 +67,6 @@ export interface FormatterConfig {
   /** Format classes on multiple lines when width exceeds this number */
   multiLineClassThreshold: number;
 
-  /** When true, non-class/className attributes are always formatted on multiple lines */
-  multiLineAttributes: boolean;
-
-  /** Format non-class/className attributes on multiple lines when total width exceeds this number */
-  multiLineAttributeThreshold: number;
-
   /** Whether to use tabs instead of spaces */
   usesTabs: boolean;
 
