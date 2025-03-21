@@ -9,7 +9,7 @@ import { FormatterConfig } from "../types";
 import { logger } from "../logger";
 
 /**
- * Gets the className/class node in a JSX element.
+ * Gets the className node in a JSX element.
  *
  * @param node - Babel AST node path for the JSX element
  * @returns The className/class node or undefined if not found
@@ -21,7 +21,7 @@ export function getClassNameNode(
     (attr): attr is t.JSXAttribute =>
       t.isJSXAttribute(attr) &&
       t.isJSXIdentifier(attr.name) &&
-      (attr.name.name === "class" || attr.name.name === "className")
+      attr.name.name === "className"
   );
 }
 
