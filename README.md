@@ -2,23 +2,21 @@
 
 Wrestling with messy class strings or opinionated formatting styles? Tailwind Formatter lets you enjoy neatly categorized, consistently formatted Tailwind classes that make your JSX/TSX code more readable and maintainable — _your way_.
 
-Organize your Tailwind classes exactly how you want them!
-
 ## Features
 
-- **Customizable Class Organization**: Group Tailwind classes by customizable prefix-based categories. Categories and their prefixes can be added, removed, or changed.
+- 🧩 **Customizable Class Organization**: Group Tailwind classes by customizable prefix-based categories.
 
-- **Responsive Class Organization**: Specialized organization for viewport/breakpoint classes (sm:, md:, lg:, etc.) that can be similarly customized.
+- 📱 **Responsive Class Organization**: Specialized organization for viewport/breakpoint classes (sm:, md:, lg:, etc.).
 
-- **Dynamic Expression Support**: Separate handling for static classes and dynamic expressions (template literals, conditionals)
+- ⚡ **Dynamic Expression Preservation**: Maintains dynamic expressions intact while organizing static classes.
 
-- **Flexible-Line Formatting**: Configure single-line or multi-line formatting with customizable thresholds
+- 📏 **Flexible Line Formatting**: Configure single-line or multi-line formatting with customizable thresholds.
 
-- **Range Formatting**: Format selections without disrupting surrounding code structure
+- 🔍 **Range Formatting**: Format selections without disrupting surrounding code structure.
 
-- **Full Document Formatting**: Format the entire document with the provided command (_Format Tailwind Classes_) or the built-in VS Code formatter command (_format Document with..._)
+- 📄 **Full Document Formatting**: Format the entire document with built-in commands.
 
-- **Format on Save**: Can be set as the default formatter for files through VS Code, with built-in Prettier integration
+- 💾 **Format on Save**: Can be set as the default formatter through VS Code settings.
 
 ## Getting Started
 
@@ -62,7 +60,7 @@ You can also place the following inside of your workspace's VS Code `settings.js
 
 ### Important: Range Formatting vs. Document Formatting
 
-The extension handles range (selection) formatting differently from full document formatting:
+The extension handles range (selection) formatting a bit differently from full document formatting:
 
 **Range Formatting**
 
@@ -102,18 +100,18 @@ _Note_: **Prettier is not applied** during range formatting to preserve the orig
 
 ## Extension Settings
 
-| Setting                                               | Description                                                     |
-| ----------------------------------------------------- | --------------------------------------------------------------- |
-| `tailwindFormatter.classes.categories`                | Categories for grouping Tailwind CSS classes                    |
-| `tailwindFormatter.classes.uncategorizedPosition`     | Where to place uncategorized static classes                     |
-| `tailwindFormatter.viewports.breakpoints`             | Viewport breakpoints to group classes by                        |
-| `tailwindFormatter.viewports.grouping`                | How to group viewport-specific classes                          |
-| `tailwindFormatter.formatting.multiLineThreshold`     | Format classes on multiple lines when width exceeds this number |
-| `tailwindFormatter.formatting.alwaysUseSingleLine`    | Always format classes on a single line                          |
-| `tailwindFormatter.indentation.usesTabs`              | Use tabs for indentation instead of spaces                      |
-| `tailwindFormatter.indentation.tabSize`               | Number of spaces to use for indentation                         |
-| `tailwindFormatter.prettier.useProjectPrettierConfig` | Use your project's Prettier config if available                 |
-| `tailwindFormatter.prettier.config`                   | Prettier configuration for the extension                        |
+| Setting                                                    | Description                                                     |
+| ---------------------------------------------------------- | --------------------------------------------------------------- |
+| `tailwindFormatter.classes.categories`                     | Categories for grouping Tailwind CSS classes                    |
+| `tailwindFormatter.classes.uncategorizedPosition`          | Where to place uncategorized static classes                     |
+| `tailwindFormatter.viewports.breakpoints`                  | Viewport breakpoints to group classes by                        |
+| `tailwindFormatter.viewports.grouping`                     | How to group viewport-specific classes                          |
+| `tailwindFormatter.lineFormatting.multiLineClasses`        | When true, always format Tailwind classes on multiple lines     |
+| `tailwindFormatter.lineFormatting.multiLineClassThreshold` | Format classes on multiple lines when width exceeds this number |
+| `tailwindFormatter.indentation.usesTabs`                   | Use tabs for indentation instead of spaces                      |
+| `tailwindFormatter.indentation.tabSize`                    | Number of spaces to use for indentation                         |
+| `tailwindFormatter.prettier.useProjectPrettierConfig`      | Use your project's Prettier config if available                 |
+| `tailwindFormatter.prettier.config`                        | Prettier configuration for the extension                        |
 
 ## Class Organization
 
@@ -125,11 +123,11 @@ Classes are grouped by user-defined categories. Each category is defined by a sp
 
 When configuring category prefixes in `tailwindFormatter.classes.categories`, follow these guidelines for accurate class matching:
 
-**For hyphenated classes**: Add the prefix with a trailing hyphen (e.g., `p-`, `m-`, `w-`)
+**Hyphenated Classes**: Add the prefix with a trailing hyphen (e.g., `p-`, `m-`, `w-`)
 
-**For standalone classes**: Include the exact class name (e.g., `block`, `container`, `hidden`)
+**Standalone Classes**: Include the exact class name (e.g., `block`, `container`, `hidden`)
 
-**For variant prefixes**: Add the full prefix with a colon (e.g., `hover:`, `focus:`, `dark:`)
+**Variant Prefixes**: Add the full prefix with a colon (e.g., `hover:`, `focus:`, `dark:`)
 
 _Note_:
 
@@ -181,8 +179,6 @@ Responsive classes (sm:, md:, lg:, etc.) are handled separately from categories 
 
   - `"inline"`: Groups by category first, then places viewport variations inline within each category
 
-For example:
-
 **With `"separate"` grouping (default):**
 
 ```jsx
@@ -218,7 +214,7 @@ className={`
 
 ### 3. Dynamic Classes
 
-Dynamic classes (using template literals, conditionals, or function calls) are also handled separately from static categories. Static classes are always placed before dynamic classes to ensure reliable style application. This follows CSS source order precedence:
+Dynamic classes (using template literals, conditionals, or function calls) are preserved in their original form and positioned after categorized static classes. This separation maintains both the logic of dynamic expressions and ensures reliable CSS precedence:
 
 ```jsx
 className={`
@@ -227,7 +223,19 @@ className={`
 `}
 ```
 
-## Prettier Integration
+_Note_: Due to their complex nature (potentially containing multiple classes in a single expression), dynamic classes are not categorized.
+
+## Additional Features
+
+### Class Line Formatting
+
+Tailwind classes can be formatted on single or multiple lines based on your preferences. Configure using `multiLineClasses` and `multiLineClassThreshold` settings.
+
+### Indentation
+
+Control indentation using tabs or spaces with the `usesTabs` and `tabSize` settings. When Prettier integration is enabled, Prettier's indentation settings (if present) will take precedence for general formatting. Your extension settings will still be used for consistent className attribute indentation and as fallbacks when Prettier doesn't specify indentation preferences.
+
+### Prettier Integration
 
 The extension comes with Prettier built-in to ensure consistent formatting. To customize Prettier formatting, you can:
 
@@ -248,7 +256,7 @@ See the [CHANGELOG](CHANGELOG.md) for details on all releases.
 
 ### 1.0.0
 
-- Initial release of Tailwind Formatter.
+- Initial release of Tailwind Formatter
 
 ## Contributing
 
@@ -260,8 +268,16 @@ This project is licensed under the MIT open source license. See [LICENSE.md](LIC
 
 ## Sponsor
 
-If you liked this extension or it helped you or your team for a project, please consider donating/sponsoring! It would be a huge help for me as a struggling new grad! Thank you!
+If you liked this extension or it helped you or your team, please consider donating/sponsoring! It would be a huge help for me as a struggling new grad! Thank you for the support!
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-❤️-pink?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/myhtica-myht)
+
+## Sponsors
+
+Thank you to all the amazing sponsors who support this project! ❤️
+
+- No one here yet! Be the first one!
 
 ---
 
-**Enjoy formatting your Tailwind classes!**
+**Enjoy formatting your Tailwind classes!!!**
