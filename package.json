@@ -44,10 +44,13 @@
     "formatting"
   ],
   "sponsor": {
-    "url": "https://github.com/sponsors/myhtica"
+    "url": "https://github.com/sponsors/myhtica-myht"
   },
   "pricing": "Free",
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:typescriptreact",
+    "onLanguage:javascriptreact"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
