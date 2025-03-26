@@ -20,7 +20,7 @@ Wrestling with messy class strings or opinionated formatting styles? Tailwind Fo
 
 ## Getting Started
 
-1. Install the extension from the [Marketplace](https://marketplace.visualstudio.com/items?itemName=myhtica-tailwind-formatter).
+1. Install the extension from the [Marketplace](https://marketplace.visualstudio.com/items?itemName=Myhtica.tailwind-formatter).
 2. Check below on the extension's formatting options, settings, and class organization.
 3. Modify the extension settings to create your own preferred formatting style.
 4. Format your classes — the way you want to!
