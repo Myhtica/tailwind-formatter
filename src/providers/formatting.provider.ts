@@ -6,7 +6,11 @@
 
 import * as vscode from "vscode";
 import { ValidationResult, Result } from "../types";
-import { SUPPORTED_EXTENSIONS } from "../config/constants.config";
+import {
+  SUPPORTED_LANGUAGES,
+  RANGE_ONLY_LANGUAGES,
+  FULLY_SUPPORTED_LANGUAGES,
+} from "../config/constants.config";
 import { FormatterConfigManager } from "../config/formatter.config";
 import { logger } from "../logger";
 import { formatText } from "../core/formatter.core";
@@ -26,14 +30,37 @@ export class TailwindFormattingProvider
    * Validates if the document can be formatted.
    *
    * @param document The document to validate
+   * @param isFullDocumentFormatting Whether this is a full document formatting operation
    * @returns Validation result
    */
-  private validateDocument(document: vscode.TextDocument): ValidationResult {
-    const extension = document.fileName.split(".").pop() || "";
-    if (!SUPPORTED_EXTENSIONS.has(extension)) {
+  private validateDocument(
+    document: vscode.TextDocument,
+    isFullDocumentFormatting: boolean = false
+  ): ValidationResult {
+    const languageId = document.languageId;
+
+    /* For range formatting, check if it's in any supported extensions */
+    if (!isFullDocumentFormatting) {
+      if (!SUPPORTED_LANGUAGES.has(languageId)) {
+        return {
+          ok: false,
+          error: `Language '${languageId}' is not supported for formatting.`,
+        };
+      }
+    }
+
+    /* For full document formatting, only allow fully supported extensions */
+    if (!FULLY_SUPPORTED_LANGUAGES.has(languageId)) {
+      if (RANGE_ONLY_LANGUAGES.has(languageId)) {
+        return {
+          ok: false,
+          error: `Full document formatting for '${languageId}' files is not supported. Please use range formatting instead by selecting the JSX/TSX-like portion of your file.`,
+        };
+      }
+
       return {
         ok: false,
-        error: `File extension .${extension} is not supported.`,
+        error: `Language '${languageId}' is not supported for formatting.`,
       };
     }
 
@@ -54,7 +81,10 @@ export class TailwindFormattingProvider
     isFullDocumentFormatting: boolean = false
   ): Promise<Result<string, string>> {
     try {
-      const validation = this.validateDocument(document);
+      const validation = this.validateDocument(
+        document,
+        isFullDocumentFormatting
+      );
       if (!validation.ok) {
         return { ok: false, error: validation.error };
       }
