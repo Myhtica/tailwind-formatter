@@ -21,7 +21,7 @@ export function getClassNameNode(
     (attr): attr is t.JSXAttribute =>
       t.isJSXAttribute(attr) &&
       t.isJSXIdentifier(attr.name) &&
-      attr.name.name === "className"
+      (attr.name.name === "class" || attr.name.name === "className")
   );
 }
 
@@ -215,23 +215,24 @@ export function fixClassNameIndentation(
   /* Regex to match className attributes with multi-line values
    * (ignores single-lines). The regex captures the following groups:
    *
-   * (1) leading whitespace            (2) attribute name + opening wrapper
-   * (3) indent before content         (4) attribute content
-   * (5) indent before closing wrapper (6) closing wrapper
-   *
+   * (1) leading whitespace            (2) class attribute with equals sign
+   * (3) opening wrapper               (4) indent before content
+   * (5) class content                 (6) indent before closing wrapper
+   * (7) closing wrapper
    */
   const classNameRegex =
-    /^(\s*)(className=(?:["']|\{`))\n(\s*)(.+?)\n(\s*)(["']|`\})/gms;
+    /^(\s*)((?:class|className)=)((?:["']|\{`))\n(\s*)(.+?)\n(\s*)(["']|`\})/gms;
   return text.replace(
     classNameRegex,
     (
       match,
       baseIndent,
-      classNameOpening,
+      classAttr,
+      openingWrapper,
       contentIndent,
       classContent,
       wrapperIndent,
-      classNameClosing
+      closingWrapper
     ) => {
       const formattedClasses = classContent
         .split("\n")
@@ -245,7 +246,7 @@ export function fixClassNameIndentation(
         })
         .join("\n");
 
-      return `${baseIndent}${classNameOpening}\n${formattedClasses}\n${baseIndent}${classNameClosing}`;
+      return `${baseIndent}${classAttr}${openingWrapper}\n${formattedClasses}\n${baseIndent}${closingWrapper}`;
     }
   );
 }
