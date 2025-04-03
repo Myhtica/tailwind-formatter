@@ -39,29 +39,28 @@ export class TailwindFormattingProvider
   ): ValidationResult {
     const languageId = document.languageId;
 
-    /* For range formatting, check if it's in any supported extensions */
-    if (!isFullDocumentFormatting) {
+    if (isFullDocumentFormatting) {
+      /* For full document formatting, only allow fully supported languages */
+      if (!FULLY_SUPPORTED_LANGUAGES.has(languageId)) {
+        if (RANGE_ONLY_LANGUAGES.has(languageId)) {
+          return {
+            ok: false,
+            error: `Full document formatting for '${languageId}' files is not supported. Please use range formatting instead by selecting the JSX/TSX-like portion of your file.`,
+          };
+        }
+
+        return {
+          ok: false,
+          error: `Language '${languageId}' is not supported for formatting.`,
+        };
+      }
+    } else {
       if (!SUPPORTED_LANGUAGES.has(languageId)) {
         return {
           ok: false,
           error: `Language '${languageId}' is not supported for formatting.`,
         };
       }
-    }
-
-    /* For full document formatting, only allow fully supported extensions */
-    if (!FULLY_SUPPORTED_LANGUAGES.has(languageId)) {
-      if (RANGE_ONLY_LANGUAGES.has(languageId)) {
-        return {
-          ok: false,
-          error: `Full document formatting for '${languageId}' files is not supported. Please use range formatting instead by selecting the JSX/TSX-like portion of your file.`,
-        };
-      }
-
-      return {
-        ok: false,
-        error: `Language '${languageId}' is not supported for formatting.`,
-      };
     }
 
     return { ok: true };
