@@ -18,9 +18,11 @@ Wrestling with messy class strings or opinionated formatting styles? Tailwind Fo
 
 - 💾 **Format on Save**: Can be set as the default formatter through VS Code settings.
 
+- 🌐 **Support for non JSX/TSX languages [NEW]**: Limited support for languages other than JSX and TSX now included! See [Support for Other File Types](#support-for-other-file-types-limited) for more details.
+
 ## Getting Started
 
-1. Install the extension from the [Marketplace](https://marketplace.visualstudio.com/items?itemName=Myhtica.tailwind-formatter).
+1. Install the extension from the [Marketplace](https://marketplace.visualstudio.com/items?itemName=Myhtica.tailwind-formatter) or directly from the [Repository](https://github.com/Myhtica/tailwind-formatter/releases/tag/v1.0.0).
 2. Check below on the extension's formatting options, settings, and class organization.
 3. Modify the extension settings to create your own preferred formatting style.
 4. Format your classes — the way you want to!
@@ -49,11 +51,16 @@ To enable automatic formatting when saving files:
 
 3. Search for "Default Formatter" and select "Tailwind Formatter"
 
-You can also place the following inside of your workspace's VS Code `settings.json` file:
+You can also place the following inside of your user's or workspace's VS Code `settings.json` file:
 
 ```
 {
-  "editor.defaultFormatter": "myhtica.tailwind-formatter",
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "Myhtica.tailwind-formatter"
+  }
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "Myhtica.tailwind-formatter"
+  },
   "editor.formatOnSave": true
 }
 ```
@@ -82,7 +89,7 @@ Range formatting (selecting part of your code and formatting just that section) 
 <div className="p-4 m-2 text-center">
 ```
 
-_Note_: **Prettier is not applied** during range formatting to preserve the original structure.
+> **Note**: Prettier is **not** applied during range formatting to preserve the original structure.
 
 **Full Document Formatting**
 
@@ -92,11 +99,44 @@ _Note_: **Prettier is not applied** during range formatting to preserve the orig
 
 **When to use each approach:**
 
-- **Range Formatting**: Use when wanting to organize specific Tailwind classes without affecting the surrounding code structure. Recommended to start with this approach to safely format specific sections of your code.
+- **Range Formatting**: Use when wanting to organize specific Tailwind classes without affecting the surrounding code structure. Highly recommended to start with this approach to safely format specific sections of your code.
+
+  **IMPORTANT: Always use Range Formatting for file types other than JSX/TSX.**
 
 - **Full Document Formatting**: Use this when you want comprehensive formatting across your entire file. Best for new files or when you're ready to standardize all Tailwind classes.
 
 - **Format on Save**: Convenient for ongoing projects but use with caution. While powerful for maintaining consistency, it may produce unexpected results in complex documents. Consider testing thoroughly before enabling project-wide.
+
+## Support for Other File Types (Limited)
+
+In addition to JSX and TSX, Tailwind Formatter currently provides **limited** support for:
+
+- **Astro** (.astro files)
+- **Vue** (.vue files)
+- **Svelte** (.svelte files)
+- **Laravel** (.blade.php files)
+- **PHP** (.php files)
+- **Elixir** (.ex, .exs files)
+- **HTML** (.html files)
+
+> **Note**: The current v1.1.0 release has significant limitations with these file types. Many of these limitations will be addressed in the upcoming v1.2.0 release with a new specialized HTML parser.
+
+When working with these file types:
+
+- Only **range formatting** is supported (select only the markup part of your code)
+- Your selection must include complete elements with both opening and closing tags
+- Include all leading whitespace in your selection
+- Some complex syntax specific to these languages may not be supported
+
+For the best experience with non-JSX/TSX files, it is recommended to:
+
+1. Select only the JSX/TSX-like portions of your file
+2. Use the "Format Selection" command instead of "Format Document"
+3. If formatting fails, try selecting a smaller portion of your code
+
+### Adding Support for More Languages
+
+If you'd like support for additional languages, please open an issue or create a PR on Github. Please note that improved support for other languages is currently in development. Check back soon for updates.
 
 ## Extension Settings
 
@@ -129,11 +169,11 @@ When configuring category prefixes in `tailwindFormatter.classes.categories`, fo
 
 **Variant Prefixes**: Add the full prefix with a colon (e.g., `hover:`, `focus:`, `dark:`)
 
-_Note_:
+> **Some things to note**:
 
-- Categories are used to group both static and _simple dynamic_ Tailwind classes (e.g. _bg-${color}_). Complex dynamic classes with ternaries or expressions are handled separately.
+> - Categories are used to group both static and _simple dynamic_ Tailwind classes (e.g. _bg-${color}_). Complex dynamic classes with ternaries or expressions are handled separately.
 
-- Specificity takes precedence for all prefix cases. For example, if there exists a general `hover:` prefix for _Category 1_ and a more specific `hover:bg-` prefix in _Category 2_, classes like `hover:bg-blue-500` will be categorized under _Category 2_ because it has a more specific (longer) matching prefix.
+> - Specificity takes precedence for all prefix cases. For example, if there exists a general `hover:` prefix for _Category 1_ and a more specific `hover:bg-` prefix in _Category 2_, classes like `hover:bg-blue-500` will be categorized under _Category 2_ because it has a more specific (longer) matching prefix.
 
 **Example Configuration:**
 
@@ -249,10 +289,17 @@ _Note_: You don't need to install Prettier in your project - it's already includ
 
 - [ *WARNING* ] Range formatting requires complete JSX elements with leading indentation
 - [ *WARNING* ] Range formatting doesn't apply Prettier (by design, to preserve structure)
+- [ *MAJOR* ] Non-JSX/TSX languages have limited support in v1.1.0, and may cause errors on formatting, particularly markup containing self-closing HTML tags (major improvements coming in v1.2.0)
 
 ## Release Notes
 
 See the [CHANGELOG](CHANGELOG.md) for details on all releases.
+
+### 1.1.0
+
+- Added limited support for additional languages: Astro, Vue, Svelte, Laravel Blade, PHP, Elixir, and HTML (range formatting only)
+- Improved error messages for unsupported formatting operations
+- Modified configuration system to handle multiple language types
 
 ### 1.0.0
 
@@ -268,7 +315,7 @@ This project is licensed under the MIT open source license. See [LICENSE.md](LIC
 
 ## Sponsor
 
-If you liked this extension or it helped you or your team, please consider donating/sponsoring! It would be a huge help for me as a struggling new grad! Thank you for the support!
+If you liked this extension or it helped you or your team, please consider donating/sponsoring! It would be a huge help for me. Thank you for the support!
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-❤️-pink?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/myhtica-myht)
 
