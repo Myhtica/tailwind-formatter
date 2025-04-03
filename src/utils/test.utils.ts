@@ -115,7 +115,16 @@ export async function formatAndCompare(testFile: string) {
 
   try {
     const inputPath = path.join(testsFileDir, testFile);
-    const expectedPath = inputPath.replace(".tsx", ".expected.tsx");
+    const fileExtension = path.extname(inputPath);
+    const baseName = path.basename(inputPath, fileExtension);
+    const dir = path.dirname(inputPath);
+
+    const expectedPath = path.join(dir, `${baseName}.expected${fileExtension}`);
+    const formattedPath = path.join(
+      dir,
+      `${baseName}.formatted${fileExtension}`
+    );
+
     const document = await vscode.workspace.openTextDocument(inputPath);
 
     await vscode.window.showTextDocument(document);
@@ -124,8 +133,6 @@ export async function formatAndCompare(testFile: string) {
     );
 
     const actualText = normalizeText(document.getText());
-    const formattedPath = inputPath.replace(".tsx", ".formatted.tsx");
-
     fs.writeFileSync(formattedPath, actualText, "utf8");
 
     const expected = normalizeText(fs.readFileSync(expectedPath, "utf8"));

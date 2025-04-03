@@ -6,7 +6,12 @@
  */
 
 import * as vscode from "vscode";
-import { FILE_CONFIGS, DEFAULT_PRETTIER_CONFIG } from "./constants.config";
+import {
+  LANGUAGE_BABEL_CONFIGS,
+  DEFAULT_PRETTIER_CONFIG,
+  RANGE_ONLY_LANGUAGES,
+} from "./constants.config";
+import { TransformOptions } from "@babel/core";
 import { FormatterConfig } from "../types";
 
 /**
@@ -89,12 +94,12 @@ export class FormatterConfigManager {
     }
 
     const config = vscode.workspace.getConfiguration("tailwindFormatter");
-    const extension = document.fileName.split(".").pop() || "";
+    const languageId = document.languageId;
 
-    const babelConfig = FILE_CONFIGS[extension as keyof typeof FILE_CONFIGS];
+    const babelConfig = this.getBabelConfigForLanguage(languageId);
     if (!babelConfig) {
       throw new Error(
-        `No babel configuration found for extension: .${extension}`
+        `Failed to resolve Babel configuration for language: ${languageId}`
       );
     }
 
@@ -122,6 +127,26 @@ export class FormatterConfigManager {
       usesTabs: config.get("indentation.usesTabs") as boolean,
       tabSize: config.get("indentation.tabSize") as number,
     };
+  }
+
+  /**
+   * Helper function to get the Babel configuration for a language.
+   * Maps languages to appropriate Babel configs with fallbacks.
+   *
+   * @param languageId The VSCode language identifier
+   * @returns Babel configuration for the language
+   * @throws Error if no configuration is available
+   */
+  private getBabelConfigForLanguage(languageId: string): TransformOptions {
+    if (languageId in LANGUAGE_BABEL_CONFIGS) {
+      return LANGUAGE_BABEL_CONFIGS[languageId];
+    }
+
+    if (RANGE_ONLY_LANGUAGES.has(languageId)) {
+      return LANGUAGE_BABEL_CONFIGS["javascriptreact"];
+    }
+
+    throw new Error(`No Babel configuration found for language: ${languageId}`);
   }
 
   /**

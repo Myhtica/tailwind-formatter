@@ -9,7 +9,7 @@
  */
 
 import * as vscode from "vscode";
-import { SUPPORTED_EXTENSIONS } from "./config/constants.config";
+import { SUPPORTED_LANGUAGES } from "./config/constants.config";
 import { TailwindFormattingProvider } from "./providers/formatting.provider";
 import { logger } from "./logger";
 
@@ -19,19 +19,17 @@ export async function activate(context: vscode.ExtensionContext) {
 
     const formattingProvider = new TailwindFormattingProvider();
 
-    for (const extension of SUPPORTED_EXTENSIONS) {
-      const pattern = { pattern: `**/*.${extension}` };
-
+    for (const languageId of SUPPORTED_LANGUAGES) {
       context.subscriptions.push(
         vscode.languages.registerDocumentFormattingEditProvider(
-          pattern,
+          { language: languageId },
           formattingProvider
         )
       );
 
       context.subscriptions.push(
         vscode.languages.registerDocumentRangeFormattingEditProvider(
-          pattern,
+          { language: languageId },
           formattingProvider
         )
       );

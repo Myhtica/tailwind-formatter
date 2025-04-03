@@ -2,7 +2,7 @@
   "name": "tailwind-formatter",
   "displayName": "Tailwind Formatter",
   "description": "Customizable formatting for Tailwind CSS classes",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -49,7 +49,14 @@
   "pricing": "Free",
   "activationEvents": [
     "onLanguage:typescriptreact",
-    "onLanguage:javascriptreact"
+    "onLanguage:javascriptreact",
+    "onLanguage:astro",
+    "onLanguage:vue",
+    "onLanguage:html",
+    "onLanguage:svelte",
+    "onLanguage:blade",
+    "onLanguage:php",
+    "onLanguage:elixir"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -57,20 +64,6 @@
       {
         "command": "tailwind-formatter.formatTailwindClasses",
         "title": "Format Tailwind Classes"
-      }
-    ],
-    "languages": [
-      {
-        "id": "typescriptreact",
-        "extensions": [
-          ".tsx"
-        ]
-      },
-      {
-        "id": "javascriptreact",
-        "extensions": [
-          ".jsx"
-        ]
       }
     ],
     "configuration": [
