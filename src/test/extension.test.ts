@@ -19,6 +19,7 @@ import { registerCategoriesSuite } from "./tests/categories.test";
 import { registerViewportsSuite } from "./tests/viewports.test";
 import { registerLineFormattingSuite } from "./tests/line-formatting.test";
 import { registerEdgeCasesSuite } from "./tests/edge-cases.test";
+import { registerOtherLanguagesSuite } from "./tests/other-languages.test";
 
 suite("Tailwind Formatter Test Suite", () => {
   suiteSetup(async () => {
@@ -46,4 +47,5 @@ suite("Tailwind Formatter Test Suite", () => {
   registerViewportsSuite();
   registerLineFormattingSuite();
   registerEdgeCasesSuite();
+  registerOtherLanguagesSuite();
 });
