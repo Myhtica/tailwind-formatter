@@ -1,3 +1,11 @@
+/**
+ * core/formatters/babel.formatter.ts
+ *
+ * AST-based formatter for JSX/TSX files using Babel.
+ * Provides precise parsing and formatting for JavaScript/TypeScript React files
+ * with full support for dynamic expressions, template literals, and complex structures.
+ */
+
 import * as t from "@babel/types";
 import traverse from "@babel/traverse";
 import { FormatterConfig } from "../../types";

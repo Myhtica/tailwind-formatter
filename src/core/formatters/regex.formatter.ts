@@ -1,3 +1,11 @@
+/**
+ * core/formatters/regex.formatter.ts
+ *
+ * Regex-based formatter for non-JSX/TSX languages like HTML, Vue, Svelte, etc.
+ * Provides basic class formatting functionality with limited support for dynamic expressions.
+ * Designed as a fallback for languages not fully supported by the Babel parser.
+ */
+
 import { FormatterConfig, ClassAttribute } from "../../types";
 import { parseTailwindClassesWithRegex } from "../parser.core";
 import { formatClassGroups } from "../formatter.core";
