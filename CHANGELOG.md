@@ -4,6 +4,14 @@ All notable changes to the "Tailwind Formatter" extension will be documented in 
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [2.0.1] - 2025-04-16
+
+### Documentation
+
+- Updated README and core formatters with minor documentation fixes/changes (comment blocks, version numbers, tags, etc.)
+
+[2.0.1]: https://github.com/myhtica/tailwind-formatter/releases/tag/v2.0.1
+
 ## [2.0.0] - 2025-04-16
 
 ### Added
