@@ -308,6 +308,10 @@ The extension comes with Prettier built-in to ensure consistent formatting. To c
 
 See the [CHANGELOG](CHANGELOG.md) for details on all releases.
 
+### 2.0.1
+
+- Minor documentation fixes and enhancements
+
 ### 2.0.0
 
 - Complete architecture overhaul with dedicated formatting engines for different languages
