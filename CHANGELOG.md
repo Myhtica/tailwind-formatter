@@ -4,20 +4,56 @@ All notable changes to the "Tailwind Formatter" extension will be documented in 
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
-## [Unreleased] - Coming in v1.2.0
+## [2.0.0] - 2025-04-16
 
-### To be Added
+### Added
 
-- **Improved Multi-language Support**: Enhanced support for non-JSX/TSX languages with a custom HTML parser
+- **Improved Multi-language Support**: Completely rebuilt the formatting engine to better support non-JSX/TSX languages:
 
-  - Reliable formatting for HTML, Vue, Svelte, Astro, Laravel Blade, PHP, and Elixir files
-  - Specialized regex-based parser designed to understand each language's unique class attribute syntax
-  - Proper handling of HTML self-closing tags and language-specific structures
-  - Better formatting preservation for non-JSX templates
+  - Added dedicated regex-based formatter for HTML, Astro, Vue, Svelte, Blade, PHP, and Elixir
+  - Maintained Babel's AST-based formatting for JSX/TSX files
 
-- **Dual Parser System**:
-  - Enhanced fallback mechanism when Babel parsing fails
-  - Language-specific optimizations for class attribute detection
+- **Language-specific Prettier Integration**:
+
+  - Added language-specific Prettier configurations for each supported language
+  - Support for language-specific Prettier plugins like prettier-plugin-svelte, prettier-plugin-astro
+  - Automatic plugin loading when available
+
+- **UI Improvements**:
+
+  - Added friendly warning system for non-JSX/TSX formatting that explains limitations
+  - Option to suppress repeated warnings for non-JSX languages
+
+- **Enhanced Utility Functions**:
+  - New utility functions for regex-based class extraction and formatting
+  - Added support for both single-line and multi-line class attributes in non-JSX files
+
+### Changed
+
+- **Architecture Overhaul**:
+
+  - Completely restructured the formatting engine to support different formatting strategies
+  - Separated formatter logic into dedicated modules for better maintainability
+  - Refactored parser to support both AST and regex-based parsing approaches
+
+- **Configuration System**:
+
+  - Enhanced the configuration manager to handle language-specific settings
+  - Improved Prettier configuration resolution and plugin handling
+  - Better error handling and fallbacks for missing configurations
+
+### Fixed
+
+- Issues with formatting in non-JSX/TSX languages (in particular html self-closing tags)
+- Indentation problems when using Prettier with non-standard languages
+- Improved error handling for unsupported languages
+
+### Documentation
+
+- Updated README with changed information about multi-language support
+- Expanded explanations about formatting limitations for non-JSX/TSX files
+
+[2.0.0]: https://github.com/myhtica/tailwind-formatter/releases/tag/v2.0.0
 
 ## [1.1.0] - 2025-04-02
 
