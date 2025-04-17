@@ -5,29 +5,20 @@
  */
 
 import { TransformOptions } from "@babel/core";
+import { PrettierLanguageConfig } from "../types";
 
 /**
- * Default Prettier configuration.
+ * Languages supported by Babel.
  */
-export const DEFAULT_PRETTIER_CONFIG = {
-  parser: "typescript", // Required for proper JSX/TSX parsing of text instead of files
-  printWidth: 80,
-  quoteProps: "preserve",
-  endOfLine: "auto",
-};
-
-/**
- * Languages fully supported by the formatter (both document and range formatting)
- */
-export const FULLY_SUPPORTED_LANGUAGES = new Set([
+export const BABEL_SUPPORTED_LANGUAGES = new Set([
   "typescriptreact",
   "javascriptreact",
 ]);
 
 /**
- * Languages with limited range-only formatting support
+ * Languages supported through regex parsing.
  */
-export const RANGE_ONLY_LANGUAGES = new Set([
+export const REGEX_SUPPORTED_LANGUAGES = new Set([
   "astro",
   "vue",
   "svelte",
@@ -38,11 +29,25 @@ export const RANGE_ONLY_LANGUAGES = new Set([
 ]);
 
 /**
- * All supported languages (combination of fully supported and range-only)
+ * Languages that are supported by Prettier (parser or plugin).
+ */
+export const PRETTIER_SUPPORTED_LANGUAGES = new Set([
+  "typescriptreact",
+  "javascriptreact",
+  "html",
+  "vue",
+  "svelte",
+  "astro",
+  "php",
+  "blade",
+]);
+
+/**
+ * All supported languages (combination of fully supported and range-only).
  */
 export const SUPPORTED_LANGUAGES = new Set([
-  ...Array.from(FULLY_SUPPORTED_LANGUAGES),
-  ...Array.from(RANGE_ONLY_LANGUAGES),
+  ...Array.from(BABEL_SUPPORTED_LANGUAGES),
+  ...Array.from(REGEX_SUPPORTED_LANGUAGES),
 ]);
 
 /**
@@ -50,7 +55,7 @@ export const SUPPORTED_LANGUAGES = new Set([
  * Each configuration has specific presets and plugins needed for parsing that language.
  */
 export const LANGUAGE_BABEL_CONFIGS: Record<string, TransformOptions> = {
-  /* JavaScript React configuration (also used as default for JSX-like languages) */
+  /* JavaScript React configuration */
   javascriptreact: {
     sourceType: "module",
     presets: [require("@babel/preset-react")], // require ensures dependency is loaded
@@ -78,4 +83,45 @@ export const LANGUAGE_BABEL_CONFIGS: Record<string, TransformOptions> = {
       plugins: ["jsx", "typescript"],
     },
   },
+};
+
+/**
+ * Language-specific Prettier configurations.
+ * Each configuration has specific parser and plugins needed for formatting that language.
+ */
+export const LANGUAGE_PRETTIER_CONFIGS: Record<string, PrettierLanguageConfig> =
+  {
+    typescriptreact: { parser: "typescript" },
+    javascriptreact: { parser: "typescript" },
+    html: { parser: "html" },
+    vue: { parser: "vue" },
+    elixir: { parser: "html" }, // fallback to html parser
+    svelte: {
+      parser: "svelte",
+      plugins: ["prettier-plugin-svelte"],
+      requiresOverride: true,
+    },
+    astro: {
+      parser: "astro",
+      plugins: ["prettier-plugin-astro"],
+      requiresOverride: true,
+    },
+    blade: {
+      parser: "blade",
+      plugins: ["prettier-plugin-blade"],
+      requiresOverride: true,
+    },
+    php: {
+      parser: "php",
+      plugins: ["@prettier/plugin-php"],
+    },
+  };
+
+/**
+ * Default Prettier configuration.
+ */
+export const DEFAULT_PRETTIER_CONFIG = {
+  printWidth: 80,
+  quoteProps: "preserve",
+  endOfLine: "auto",
 };

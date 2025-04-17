@@ -5,7 +5,7 @@
  */
 
 import * as t from "@babel/types";
-import { FormatterConfig } from "../types";
+import { FormatterConfig, ClassAttribute } from "../types";
 import { logger } from "../logger";
 
 /**
@@ -23,6 +23,45 @@ export function getClassNameNode(
       t.isJSXIdentifier(attr.name) &&
       (attr.name.name === "class" || attr.name.name === "className")
   );
+}
+
+/**
+ * Gets class attributes from text using regular expressions.
+ *
+ * @param text - The text to get class attributes from
+ * @returns Array of extracted class attributes
+ */
+export function getClassAttributes(text: string): ClassAttribute[] {
+  const patterns = [
+    /* Multi-line class attributes with newlines */
+    /(\s*)((?:class|className)=)(["']|\{`)\n([\s\S]*?)\n(\s*)(["']|\}`)/gm,
+
+    /* Single-line class attributes */
+    /(\s*)((?:class|className)=)(["']|\{`)([^"'`}]*?)(["']|\}`)/g,
+  ];
+
+  const attributes: ClassAttribute[] = [];
+
+  for (const pattern of patterns) {
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      const [fullMatch, indent, attrWithEquals, opening, value, closing] =
+        match;
+      const attrName = attrWithEquals.replace("=", "").trim();
+
+      attributes.push({
+        name: attrName,
+        value: value.trim(),
+        opening,
+        closing,
+        start: match.index,
+        end: match.index + fullMatch.length,
+        indentation: indent,
+      });
+    }
+  }
+
+  return attributes;
 }
 
 /**
@@ -114,8 +153,33 @@ export async function formatWithPrettier(
 ): Promise<string> {
   try {
     const prettier = require("prettier");
-    const formattedText = await prettier.format(text, prettierConfig);
 
+    /* Load language-specific plugins using import */
+    if (prettierConfig.plugins) {
+      try {
+        const loadedPlugins = [];
+
+        for (const pluginName of prettierConfig.plugins) {
+          try {
+            const plugin = await import(pluginName);
+            loadedPlugins.push(plugin.default || plugin);
+          } catch (error) {
+            logger.warn(`Failed to load plugin ${pluginName}: ${error}`);
+          }
+        }
+
+        if (loadedPlugins.length > 0) {
+          prettierConfig.plugins = loadedPlugins;
+        } else {
+          delete prettierConfig.plugins;
+        }
+      } catch (error) {
+        logger.warn(`Failed to load Prettier plugins: ${error}`);
+        delete prettierConfig.plugins;
+      }
+    }
+
+    const formattedText = await prettier.format(text, prettierConfig);
     if (!formattedText) {
       logger.warn(
         "Prettier returned null result. Using Tailwind-only formatting"

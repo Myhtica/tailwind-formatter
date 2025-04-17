@@ -7,9 +7,10 @@
 
 import * as vscode from "vscode";
 import {
+  REGEX_SUPPORTED_LANGUAGES,
   LANGUAGE_BABEL_CONFIGS,
+  LANGUAGE_PRETTIER_CONFIGS,
   DEFAULT_PRETTIER_CONFIG,
-  RANGE_ONLY_LANGUAGES,
 } from "./constants.config";
 import { TransformOptions } from "@babel/core";
 import { FormatterConfig } from "../types";
@@ -20,7 +21,10 @@ import { FormatterConfig } from "../types";
  */
 export class FormatterConfigManager {
   private static instance: FormatterConfigManager;
-  private staticConfig: Omit<FormatterConfig, "prettierConfig"> | null = null;
+  private staticConfig: Omit<
+    FormatterConfig,
+    "prettierConfig" | "babelConfig"
+  > | null = null;
   private disposables: vscode.Disposable[] = [];
 
   /**
@@ -57,7 +61,7 @@ export class FormatterConfigManager {
 
   /**
    * Gets the complete formatter configuration for a document.
-   * Combines cached static config with dynamic Prettier config.
+   * Combines cached static config with dynamic configs.
    */
   public async getConfig(
     document: vscode.TextDocument
@@ -68,6 +72,13 @@ export class FormatterConfigManager {
         throw new Error("Failed to get static configuration");
       }
 
+      const babelConfig = this.getBabelConfig(document);
+      if (!babelConfig) {
+        throw new Error(
+          `Failed to resolve Babel configuration for language: ${document.languageId}`
+        );
+      }
+
       const prettierConfig = await this.getPrettierConfig(document);
       if (!prettierConfig) {
         throw new Error("Failed to get Prettier configuration");
@@ -75,6 +86,7 @@ export class FormatterConfigManager {
 
       return {
         ...this.staticConfig!,
+        babelConfig,
         prettierConfig,
         usesTabs: prettierConfig.useTabs ?? this.staticConfig.usesTabs,
         tabSize: prettierConfig.tabWidth ?? this.staticConfig.tabSize,
@@ -86,7 +98,7 @@ export class FormatterConfigManager {
 
   /**
    * Initializes or returns cached static configuration.
-   * Includes babel config, categories, viewports, and other formatting options.
+   * Includes categories, viewports, and other formatting options.
    */
   private getStaticConfig(document: vscode.TextDocument): void {
     if (this.staticConfig) {
@@ -94,18 +106,8 @@ export class FormatterConfigManager {
     }
 
     const config = vscode.workspace.getConfiguration("tailwindFormatter");
-    const languageId = document.languageId;
-
-    const babelConfig = this.getBabelConfigForLanguage(languageId);
-    if (!babelConfig) {
-      throw new Error(
-        `Failed to resolve Babel configuration for language: ${languageId}`
-      );
-    }
 
     this.staticConfig = {
-      babelConfig,
-
       categories: config.get("classes.categories") as Record<string, string>,
       uncategorizedPosition: config.get("classes.uncategorizedPosition") as
         | "beforeCategorized"
@@ -130,19 +132,20 @@ export class FormatterConfigManager {
   }
 
   /**
-   * Helper function to get the Babel configuration for a language.
-   * Maps languages to appropriate Babel configs with fallbacks.
+   * Helper function to get the Babel configuration for a specific document.
    *
    * @param languageId The VSCode language identifier
    * @returns Babel configuration for the language
    * @throws Error if no configuration is available
    */
-  private getBabelConfigForLanguage(languageId: string): TransformOptions {
+  private getBabelConfig(document: vscode.TextDocument): TransformOptions {
+    const languageId = document.languageId;
+
     if (languageId in LANGUAGE_BABEL_CONFIGS) {
       return LANGUAGE_BABEL_CONFIGS[languageId];
     }
 
-    if (RANGE_ONLY_LANGUAGES.has(languageId)) {
+    if (REGEX_SUPPORTED_LANGUAGES.has(languageId)) {
       return LANGUAGE_BABEL_CONFIGS["javascriptreact"];
     }
 
@@ -164,6 +167,8 @@ export class FormatterConfigManager {
     const extensionConfig =
       vscode.workspace.getConfiguration("tailwindFormatter");
     const documentPath = document.uri.fsPath;
+    const languageId = document.languageId;
+    const langConfig = LANGUAGE_PRETTIER_CONFIGS[languageId];
     const usesTabs = extensionConfig.get("indentation.usesTabs") as boolean;
     const tabSize = extensionConfig.get("indentation.tabSize") as number;
 
@@ -174,6 +179,14 @@ export class FormatterConfigManager {
       "prettier.config"
     ) as Record<string, any> | null;
 
+    let prettierConfig: Record<string, any> = {
+      ...DEFAULT_PRETTIER_CONFIG,
+      ...(extensionPrettierConfig ?? {}), // merge with default config if present
+      parser: langConfig.parser || languageId,
+      useTabs: usesTabs,
+      tabWidth: tabSize,
+    };
+
     if (useProjectPrettierConfig) {
       try {
         const prettier = require("prettier");
@@ -182,12 +195,12 @@ export class FormatterConfigManager {
 
         if (projectPrettierConfig) {
           /*
-           * Ensure parser is set to our default parser because we are not
-           * parsing files but rather the document text itself.
+           * Ensure parser is set to our language-specific parser because
+           * we are not parsing files but rather the document text itself.
            */
-          return {
+          prettierConfig = {
             ...projectPrettierConfig,
-            parser: DEFAULT_PRETTIER_CONFIG.parser,
+            parser: langConfig.parser,
           };
         }
       } catch (error) {
@@ -195,12 +208,22 @@ export class FormatterConfigManager {
       }
     }
 
-    /* Fallback to extension config or defaults  */
-    return {
-      ...DEFAULT_PRETTIER_CONFIG,
-      ...(extensionPrettierConfig ?? {}), // merge with default config if present
-      useTabs: usesTabs,
-      tabWidth: tabSize,
-    };
+    if (langConfig.plugins && langConfig.plugins.length > 0) {
+      prettierConfig.plugins = langConfig.plugins;
+    }
+
+    if (langConfig.requiresOverride) {
+      const fileExtension = document.fileName.split(".").pop();
+      prettierConfig.overrides = [
+        {
+          files: [`*.${fileExtension}`],
+          options: {
+            parser: langConfig.parser,
+          },
+        },
+      ];
+    }
+
+    return prettierConfig;
   }
 }

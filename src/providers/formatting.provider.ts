@@ -8,8 +8,8 @@ import * as vscode from "vscode";
 import { ValidationResult, Result } from "../types";
 import {
   SUPPORTED_LANGUAGES,
-  RANGE_ONLY_LANGUAGES,
-  FULLY_SUPPORTED_LANGUAGES,
+  BABEL_SUPPORTED_LANGUAGES,
+  REGEX_SUPPORTED_LANGUAGES,
 } from "../config/constants.config";
 import { FormatterConfigManager } from "../config/formatter.config";
 import { logger } from "../logger";
@@ -33,34 +33,65 @@ export class TailwindFormattingProvider
    * @param isFullDocumentFormatting Whether this is a full document formatting operation
    * @returns Validation result
    */
-  private validateDocument(
+  private async validateDocument(
     document: vscode.TextDocument,
     isFullDocumentFormatting: boolean = false
-  ): ValidationResult {
+  ): Promise<ValidationResult> {
     const languageId = document.languageId;
 
     if (isFullDocumentFormatting) {
-      /* For full document formatting, only allow fully supported languages */
-      if (!FULLY_SUPPORTED_LANGUAGES.has(languageId)) {
-        if (RANGE_ONLY_LANGUAGES.has(languageId)) {
-          return {
-            ok: false,
-            error: `Full document formatting for '${languageId}' files is not supported. Please use range formatting instead by selecting the JSX/TSX-like portion of your file.`,
-          };
-        }
+      if (BABEL_SUPPORTED_LANGUAGES.has(languageId)) {
+        return { ok: true };
+      }
 
-        return {
-          ok: false,
-          error: `Language '${languageId}' is not supported for formatting.`,
-        };
+      if (REGEX_SUPPORTED_LANGUAGES.has(languageId)) {
+        const warningResult = await this.showNonJSXWarning(languageId);
+        return warningResult.ok ? { ok: true } : warningResult;
       }
     } else {
-      if (!SUPPORTED_LANGUAGES.has(languageId)) {
-        return {
-          ok: false,
-          error: `Language '${languageId}' is not supported for formatting.`,
-        };
+      if (SUPPORTED_LANGUAGES.has(languageId)) {
+        return { ok: true };
       }
+    }
+
+    return {
+      ok: false,
+      error: `Language '${languageId}' is not supported for formatting.`,
+    };
+  }
+
+  /**
+   * Shows a warning about limitations when formatting non-JSX/TSX files.
+   * Allows users to continue or disable future warnings.
+   *
+   * @param languageId The language ID being formatted
+   * @returns ValidationResult indicating whether to proceed
+   */
+  private async showNonJSXWarning(
+    languageId: string
+  ): Promise<ValidationResult> {
+    const config = vscode.workspace.getConfiguration("tailwindFormatter");
+    const suppressWarning = config.get("suppressNonJSXWarning") as boolean;
+
+    if (!suppressWarning) {
+      const selection = await vscode.window.showWarningMessage(
+        `Full document formatting for '${languageId}' files has limitations: dynamic classes will be ignored and only static classes will be formatted.`,
+        { modal: false },
+        "Continue Anyway",
+        "Don't Show Again"
+      );
+
+      if (selection === "Don't Show Again") {
+        await config.update("suppressNonJSXWarning", true, true);
+      }
+
+      if (!selection) {
+        return { ok: false, error: "Operation canceled by user" };
+      }
+
+      logger.log(
+        `Proceeding with limited formatting support for ${languageId}`
+      );
     }
 
     return { ok: true };
@@ -80,7 +111,7 @@ export class TailwindFormattingProvider
     isFullDocumentFormatting: boolean = false
   ): Promise<Result<string, string>> {
     try {
-      const validation = this.validateDocument(
+      const validation = await this.validateDocument(
         document,
         isFullDocumentFormatting
       );
@@ -103,6 +134,7 @@ export class TailwindFormattingProvider
 
       const formattedText = await formatText(
         documentText,
+        document.languageId,
         formatterConfig,
         isFullDocumentFormatting
       );

@@ -2,7 +2,7 @@
   "name": "tailwind-formatter",
   "displayName": "Tailwind Formatter",
   "description": "Customizable formatting for Tailwind CSS classes",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -200,6 +200,20 @@
             "description": "Prettier configuration for the extension. \n\n This configuration must be edited in settings.json. It will also be overridden by project-level Prettier config if `tailwindFormatter.prettier.useUserConfig` is true."
           }
         }
+      },
+      {
+        "id": "notifications",
+        "title": "Notifications",
+        "order": 7,
+        "properties": {
+          "tailwindFormatter.suppressNonJSXWarning": {
+            "type": "boolean",
+            "order": 1,
+            "default": false,
+            "description": "Suppress warnings when formatting non-JSX/TSX files with limited support for dynamic classes.",
+            "markdownDescription": "When enabled, hides the warning that appears when formatting non-JSX/TSX files with full document formatting, which has limited support for dynamic classes and template expressions."
+          }
+        }
       }
     ]
   },
@@ -243,6 +257,10 @@
     "@babel/preset-typescript": "^7.26.0",
     "@babel/traverse": "^7.26.8",
     "@babel/types": "^7.26.8",
-    "prettier": "^3.5.1"
+    "@prettier/plugin-php": "^0.22.4",
+    "prettier": "^3.5.3",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-blade": "^2.1.21",
+    "prettier-plugin-svelte": "^3.3.3"
   }
 }

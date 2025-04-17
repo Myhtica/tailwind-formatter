@@ -19,7 +19,7 @@ import { ClassParseResult } from "../types";
  * @param viewports - The list of viewport prefixes to check for
  * @returns ClassParseResult object containing baseClasses, viewportClasses, and dynamicExpressions
  */
-export function parseTailwindClasses(
+export function parseTailwindClassesWithBabel(
   classNameNode: t.JSXAttribute,
   sourceText: string,
   categories: Record<string, string>,
@@ -69,6 +69,27 @@ export function parseTailwindClasses(
       parsedClasses.dynamicExpressions.push(`\${${expressionText}}`);
     }
   }
+
+  return parsedClasses;
+}
+
+export function parseTailwindClassesWithRegex(
+  classNameString: string,
+  sourceText: string,
+  categories: Record<string, string>,
+  viewports: string[]
+): ClassParseResult {
+  const parsedClasses: ClassParseResult = {
+    baseClasses: [],
+    viewportClasses: {},
+    dynamicExpressions: [],
+  };
+  viewports.forEach((viewport) => {
+    parsedClasses.viewportClasses[viewport] = [];
+  });
+
+  /* Only process static class names for regex */
+  processTailwindClasses(classNameString, parsedClasses, viewports);
 
   return parsedClasses;
 }
