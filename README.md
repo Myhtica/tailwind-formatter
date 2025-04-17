@@ -1,6 +1,6 @@
 # Tailwind Formatter - Class Organization, Your Way
 
-Wrestling with messy class strings or opinionated formatting styles? Tailwind Formatter lets you enjoy neatly categorized, consistently formatted Tailwind classes that make your JSX/TSX code more readable and maintainable — _your way_.
+Wrestling with messy class strings or opinionated formatting styles? Tailwind Formatter lets you enjoy neatly categorized, consistently formatted utility classes that make your code more readable and maintainable — _your way_.
 
 ## Features
 
@@ -18,7 +18,7 @@ Wrestling with messy class strings or opinionated formatting styles? Tailwind Fo
 
 - 💾 **Format on Save**: Can be set as the default formatter through VS Code settings.
 
-- 🌐 **Support for non JSX/TSX languages [NEW]**: Limited support for languages other than JSX and TSX now included! See [Support for Other File Types](#support-for-other-file-types-limited) for more details.
+- 🌐 **Multi-language Support [ENHANCED]**: Improved support for HTML, Astro, Vue, Svelte, Blade, PHP, and Elixir files. See [Multi-language Support](#multi-language-support) for more details.
 
 ## Getting Started
 
@@ -51,7 +51,7 @@ To enable automatic formatting when saving files:
 
 3. Search for "Default Formatter" and select "Tailwind Formatter"
 
-You can also place the following inside of your user's or workspace's VS Code `settings.json` file:
+You can also place the following inside of your user's or workspace's VS Code `settings.json` file. The following will enable automatic formatting for typescript and javascript files:
 
 ```
 {
@@ -107,36 +107,47 @@ Range formatting (selecting part of your code and formatting just that section) 
 
 - **Format on Save**: Convenient for ongoing projects but use with caution. While powerful for maintaining consistency, it may produce unexpected results in complex documents. Consider testing thoroughly before enabling project-wide.
 
-## Support for Other File Types (Limited)
+## Multi-language Support
 
-In addition to JSX and TSX, Tailwind Formatter currently provides **limited** support for:
+Tailwind Formatter now provides support for multiple languages through two specialized formatting engines:
 
-- **Astro** (.astro files)
-- **Vue** (.vue files)
-- **Svelte** (.svelte files)
+### AST-based Formatting (Full Support)
+
+- **JSX/TSX**: Complete support with dynamic expression preservation, responsive class organization, and all other features
+
+### Regex-based Formatting (No Dynamic Classes)
+
+- **Astro**: (.astro files)
+- **Vue**: (.vue files)
+- **Svelte**: (.svelte files)
 - **Laravel** (.blade.php files)
-- **PHP** (.php files)
-- **Elixir** (.ex, .exs files)
-- **HTML** (.html files)
+- **PHP**: (.php files)
+- **Elixir**: (.ex, .exs files)
+- **HTML**: (.html files)
 
-> **Note**: The current v1.1.0 release has significant limitations with these file types. Many of these limitations will be addressed in the upcoming v1.2.0 release with a new specialized HTML parser.
+For non-JSX/TSX languages, the formatter works best with static class strings. Dynamic class expressions are preserved but not categorized in these languages. It is still highly recommended to continue using "Format Selection" for other languages due to potential errors or edge cases with the regex approach.
 
-When working with these file types:
+### Language-specific Features
 
-- Only **range formatting** is supported (select only the markup part of your code)
-- Your selection must include complete elements with both opening and closing tags
-- Include all leading whitespace in your selection
-- Some complex syntax specific to these languages may not be supported
+- **Regex-based Parsing**: Regex-based parsing now handles both JSX and HTML elements appropriately. Range-based selections no longer require complete elements and can format classes with just the opening html tag.
+- **Automatic Prettier Integration**: The extension now detects and uses the appropriate Prettier parser for each language
+- **Plugin Support**: Automatically works with language-specific Prettier plugins when available (Svelte, Astro, PHP, etc.)
+- **Format on Save**: Works with all supported languages
 
-For the best experience with non-JSX/TSX files, it is recommended to:
+### Best Practices for Non-JSX/TSX Languages
 
-1. Select only the JSX/TSX-like portions of your file
-2. Use the "Format Selection" command instead of "Format Document"
-3. If formatting fails, try selecting a smaller portion of your code
+For the best experience with non-JSX/TSX files:
+
+1. When using range formatting, although your selection no longer requires complete elements, including the leading whitespace is still recommended for indentation purposes.
+2. For complex templates with many dynamic expressions, use range formatting on specific sections rather than formatting the entire document
+3. If formatting fails, try selecting a smaller portion of your code with the "Format Selection" command instead of "Format Document."
+4. If you encounter any issues with a particular language, please report them on GitHub.
+
+> **Note**: When using regex-based formatting, the extension only has access to the opening tag and class attribute, not the closing tag or surrounding context. This means that if a one-line class becomes multi-line during formatting, the indentation of the closing quotes/tags might appear misaligned. This is a limitation of the regex-based approach and primarily affects HTML-like languages.
 
 ### Adding Support for More Languages
 
-If you'd like support for additional languages, please open an issue or create a PR on Github. Please note that improved support for other languages is currently in development. Check back soon for updates.
+If you'd like support for additional languages, please open an issue or create a PR on Github.
 
 ## Extension Settings
 
@@ -152,6 +163,7 @@ If you'd like support for additional languages, please open an issue or create a
 | `tailwindFormatter.indentation.tabSize`                    | Number of spaces to use for indentation                         |
 | `tailwindFormatter.prettier.useProjectPrettierConfig`      | Use your project's Prettier config if available                 |
 | `tailwindFormatter.prettier.config`                        | Prettier configuration for the extension                        |
+| `tailwindFormatter.suppressNonJSXWarning`                  | Suppress warnings about non-JSX/TSX formatting limitations      |
 
 ## Class Organization
 
@@ -263,7 +275,7 @@ className={`
 `}
 ```
 
-_Note_: Due to their complex nature (potentially containing multiple classes in a single expression), dynamic classes are not categorized.
+> **Note**: Due to their complex nature (potentially containing multiple classes in a single expression), dynamic classes are not categorized.
 
 ## Additional Features
 
@@ -283,17 +295,26 @@ The extension comes with Prettier built-in to ensure consistent formatting. To c
 
 - Customize Prettier settings directly through the `tailwindFormatter.prettier.config` extension setting
 
-_Note_: You don't need to install Prettier in your project - it's already included with the extension. The extension will read your `.prettierrc` configuration file if present, but uses its own Prettier installation. However, it does not directly interact with or extract settings from an external Prettier extension installed in VS Code.
+> **Note**: You don't need to install Prettier in your project - it's already included with the extension. The extension will read your `.prettierrc` configuration file if present, but uses its own Prettier installation. However, it does not directly interact with or extract settings from an external Prettier extension installed in VS Code.
 
 ## Known Issues
 
-- [ *WARNING* ] Range formatting requires complete JSX elements with leading indentation
+- [ *WARNING* ] Range formatting for JSX/TSX requires complete elements with leading indentation
 - [ *WARNING* ] Range formatting doesn't apply Prettier (by design, to preserve structure)
-- [ *MAJOR* ] Non-JSX/TSX languages have limited support in v1.1.0, and may cause errors on formatting, particularly markup containing self-closing HTML tags (major improvements coming in v1.2.0)
+- [ *NOTE* ] For non-JSX/TSX languages, complex dynamic expressions are ignored.
+- [ *MINOR* ] When using regex-based formatting (non-JSX/TSX languages), indentation issues may occur if a one-line class becomes multi-line, as the formatter only has access to the opening tag, not the closing tags or surrounding context
 
 ## Release Notes
 
 See the [CHANGELOG](CHANGELOG.md) for details on all releases.
+
+### 2.0.0
+
+- Complete architecture overhaul with dedicated formatting engines for different languages
+- Enhanced support for HTML, Astro, Vue, Svelte, Blade, PHP, and Elixir files
+- Language-specific Prettier integration with plugin support
+- Improved error handling and user notifications
+- New warning system for non-JSX/TSX limitations with option to suppress
 
 ### 1.1.0
 
